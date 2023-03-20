@@ -2,7 +2,6 @@ const http = require("http");
 const fs = require("fs");
 const args = require("minimist")(process.argv.slice(2));
 port =args["port"];
-console.log(port);
 
 let homeContent = "";
 let projectContent = "";
