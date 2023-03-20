@@ -1,9 +1,32 @@
 /* eslint-disable no-undef */
 const todoList = require("../todo");
-const { all, markAsComplete, add, overdue, dueToday, dueLater } = todoList();
+const {
+  all,
+  markAsComplete,
+  add,
+  overdue,
+  dueToday,
+  dueLater,
+  toDisplayableList,
+} = todoList();
 
 const formattedDate = (d) => {
   return d.toISOString().split("T")[0];
+};
+
+const toDisplayableList1 = (list) => {
+  // Format the To-Do list here, and return the output string
+  // as per the format given above.
+  let format = "[$x] $title $duedate";
+  let temp = [];
+  list.forEach((element) => {
+    let ind = format
+      .replace("$x", element.completed ? "x" : " ")
+      .replace("$title", element.title)
+      .replace("$duedate", element.dueDate);
+    temp.push(ind);
+  });
+  return temp.join("\n");
 };
 
 var dateToday = new Date();
@@ -68,6 +91,8 @@ describe("Todo list Test suite", () => {
     expect(overDue.length).toBe(2);
     expect(overDue[0].dueDate).toEqual(yesterday);
     expect(overDue[1].title).toEqual("fourth todo list");
+    const overdueString = toDisplayableList(overDue);
+    expect(overdueString).toEqual(toDisplayableList1(overDue));
   });
 
   test("Should return dueToady", () => {
@@ -75,6 +100,8 @@ describe("Todo list Test suite", () => {
     expect(todayDue.length).toBe(2);
     expect(todayDue[0].dueDate).toEqual("");
     expect(todayDue[1].title).toEqual("sixth todo list");
+    const todaydueString = toDisplayableList(todayDue);
+    expect(todaydueString).toEqual(toDisplayableList1(todayDue));
   });
 
   test("Should return dueLater", () => {
@@ -82,5 +109,7 @@ describe("Todo list Test suite", () => {
     expect(laterDue.length).toBe(2);
     expect(laterDue[0].dueDate).toEqual(tomorrow);
     expect(laterDue[1].title).toEqual("fifth todo list");
+    const laterdueString = toDisplayableList(laterDue);
+    expect(laterdueString).toEqual(toDisplayableList1(laterDue));
   });
 });
