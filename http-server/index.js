@@ -1,7 +1,8 @@
 const http = require("http");
 const fs = require("fs");
 const args = require("minimist")(process.argv.slice(2));
-const port =args["_"][0];
+port =args["port"];
+console.log(port);
 
 let homeContent = "";
 let projectContent = "";
@@ -46,6 +47,5 @@ http.createServer((request, response) => {
         response.end();
         break;
     }
-        })
-        .listen(port);
-
+    })
+    .listen(port);
