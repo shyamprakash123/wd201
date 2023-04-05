@@ -71,12 +71,7 @@ module.exports = (sequelize, DataTypes) => {
             dueDate: today,
           },
         });
-        let list = [];
-        totalCount.forEach((todo) => {
-          todo.dueDate = "";
-          list.push(todo);
-        });
-        return list;
+        return totalCount;
       } catch (error) {
         console.error(error);
       }
