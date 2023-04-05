@@ -3,6 +3,9 @@
 "use strict";
 const { Model } = require("sequelize");
 const { Op } = require("sequelize");
+
+const today = new Date().toISOString().slice(0, 10);
+
 module.exports = (sequelize, DataTypes) => {
   class Todo extends Model {
     /**
@@ -23,41 +26,30 @@ module.exports = (sequelize, DataTypes) => {
       console.log("Overdue");
       // FILL IN HERE
       const overdues = await this.overdue();
-      let list = [];
       await overdues.forEach((todo) => {
-        list.push(todo.displayableString());
+        console.log(todo.displayableString());
       });
-      if (list.length > 1) {
-        console.log(list.join("\n"));
-      }
       console.log("\n");
 
       console.log("Due Today");
       // FILL IN HERE
       const todaydues = await this.dueToday();
-      list = [];
       await todaydues.forEach((todo) => {
-        list.push(todo.displayableString());
+        console.log(todo.displayableString());
       });
-      if (list.length > 1) {
-        console.log(list.join("\n"));
-      }
       console.log("\n");
 
       console.log("Due Later");
       // FILL IN HERE
       const laterdues = await this.dueLater();
-      list = [];
       await laterdues.forEach((todo) => {
-        list.push(todo.displayableString());
+        console.log(todo.displayableString());
       });
-      console.log(list.join("\n"));
     }
 
     static async overdue() {
       // FILL IN HERE TO RETURN OVERDUE ITEMS
       try {
-        const today = new Date().toISOString().split("T")[0];
         const totalCount = await Todo.findAll({
           where: {
             dueDate: {
@@ -74,7 +66,6 @@ module.exports = (sequelize, DataTypes) => {
     static async dueToday() {
       // FILL IN HERE TO RETURN ITEMS DUE tODAY
       try {
-        const today = new Date().toISOString().split("T")[0];
         const totalCount = await Todo.findAll({
           where: {
             dueDate: today,
@@ -94,7 +85,6 @@ module.exports = (sequelize, DataTypes) => {
     static async dueLater() {
       // FILL IN HERE TO RETURN ITEMS DUE LATER
       try {
-        const today = new Date().toISOString().split("T")[0];
         const totalCount = await Todo.findAll({
           where: {
             dueDate: {
@@ -125,9 +115,12 @@ module.exports = (sequelize, DataTypes) => {
     }
 
     displayableString() {
-      const today = new Date().toISOString().split("T")[0];
       let checkbox = this.completed ? "[x]" : "[ ]";
-      return `${this.id}. ${checkbox} ${this.title} ${this.dueDate}`.trim();
+      if (this.dueDate === today) {
+        return `${this.id}. ${checkbox} ${this.title}`;
+      } else {
+        return `${this.id}. ${checkbox} ${this.title} ${this.dueDate}`;
+      }
     }
   }
   Todo.init(
