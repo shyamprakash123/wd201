@@ -48,12 +48,16 @@ app.delete("/todos/:id", async (request, response) => {
   console.log("Delete a todo by ID:", request.params.id);
   const TodoID = request.params.id;
   try {
-    await Todo.destroy({
+    const res = await Todo.destroy({
       where: {
         id: TodoID,
       },
     });
-    return response.send(true);
+    if (res > 0) {
+      return response.send(true);
+    } else {
+      return response.send(false);
+    }
   } catch (err) {
     console.error(err);
     return response.send(false);
