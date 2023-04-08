@@ -53,10 +53,10 @@ app.delete("/todos/:id", async (request, response) => {
         id: TodoID,
       },
     });
-    return response.status(200).send(true);
+    return response.send(true);
   } catch (err) {
     console.error(err);
-    return response.status(422).send(false);
+    return response.send(false);
   }
 });
 
