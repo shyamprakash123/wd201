@@ -1,5 +1,5 @@
 <div>
-            <h5 id="count-overdue">Overdue <%= overDue.length %></h5>
+            <h5>Overdue</h5><h6 id="count-overdue"><%= overDue.length %></h6>
             <ul class="list-none">
                 <% for(var i=0; i < overDue.length; i++) { %>
                 <li class="Todo-Item">
@@ -15,7 +15,7 @@
                 </li>
                 <% } %>
             </ul>
-            <h5 id="count-due-today">Due Today <%= dueToday.length %></h5>
+            <h5>Due Today</h5> <h6 id="count-due-today"><%= dueToday.length %></h6>
             <ul class="list-none">
                 <% for(var i=0; i < dueToday.length; i++) { %>
                 <li class="Todo-Item">
@@ -31,7 +31,7 @@
                 </li>
                 <% } %>
             </ul>
-            <h5 id="count-due-later">Due Later <%= dueLater.length %></h5>
+            <h5>Due Later</h5><h6 id="count-due-later"><%= dueLater.length %></h6>
             <ul class="list-none">
                 <% for(var i=0; i < dueLater.length; i++) { %>
                 <li class="Todo-Item">
