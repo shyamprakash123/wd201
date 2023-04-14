@@ -1,11 +1,20 @@
+/* eslint-disable no-unused-vars */
 /* eslint-disable no-undef */
 const express = require("express");
+var csrf = require("csurf");
 const app = express();
+var cookieParser = require("cookie-parser");
 const { Todo } = require("./models");
 const bodyParser = require("body-parser");
 const path = require("path");
 
 app.use(bodyParser.json());
+
+app.use(express.urlencoded({ extended: false }));
+
+app.use(cookieParser("shh! some secret string"));
+
+app.use(csrf({ cookie: true }));
 
 app.set("view engine", "ejs");
 
@@ -19,10 +28,13 @@ app.get("/", async (request, response) => {
       overDue,
       dueToday,
       dueLater,
+      csrfToken: request.csrfToken(),
     });
   } else {
     response.json({
-      allTodos,
+      overDue,
+      dueToday,
+      dueLater,
     });
   }
 });
@@ -48,7 +60,7 @@ app.post("/todos", async (request, response) => {
       dueDate: request.body.dueDate,
       completed: false,
     });
-    return response.json(todo);
+    return response.redirect("/");
   } catch (error) {
     console.error(error);
     return response.status(422).json(error);
@@ -69,21 +81,11 @@ app.put("/todos/:id/markAsCompleted", async (request, response) => {
 
 app.delete("/todos/:id", async (request, response) => {
   console.log("Delete a todo by ID:", request.params.id);
-  const TodoID = request.params.id;
   try {
-    const res = await Todo.destroy({
-      where: {
-        id: TodoID,
-      },
-    });
-    if (res > 0) {
-      return response.send(true);
-    } else {
-      return response.send(false);
-    }
+    await Todo.remove(request.params.id);
+    return response.json({ success: true });
   } catch (err) {
-    console.error(err);
-    return response.send(false);
+    return response.status(422).json(err);
   }
 });
 
