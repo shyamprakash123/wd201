@@ -28,6 +28,7 @@ module.exports = (sequelize, DataTypes) => {
     static getOverDue() {
       return this.findAll({
         where: {
+          completed: false,
           dueDate: {
             [Op.lt]: today,
           },
@@ -39,6 +40,7 @@ module.exports = (sequelize, DataTypes) => {
       return this.findAll({
         where: {
           dueDate: today,
+          completed: false,
         },
       });
     }
@@ -46,6 +48,7 @@ module.exports = (sequelize, DataTypes) => {
     static getDueLater() {
       return this.findAll({
         where: {
+          completed: false,
           dueDate: {
             [Op.gt]: today,
           },
@@ -59,6 +62,18 @@ module.exports = (sequelize, DataTypes) => {
           id,
         },
       });
+    }
+
+    static async getCompleted() {
+      return this.findAll({
+        where: {
+          completed: true,
+        },
+      });
+    }
+
+    setCompletionStatus(val) {
+      return this.update({ completed: !val });
     }
 
     markAsComplete() {
