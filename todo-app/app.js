@@ -10,10 +10,15 @@ app.use(bodyParser.json());
 app.set("view engine", "ejs");
 
 app.get("/", async (request, response) => {
-  const allTodos = await Todo.getTodos();
+  const overDue = await Todo.getOverDue();
+  const dueToday = await Todo.getDueToday();
+  const dueLater = await Todo.getDueLater();
+
   if (request.accepts("html")) {
     response.render("index", {
-      allTodos,
+      overDue,
+      dueToday,
+      dueLater,
     });
   } else {
     response.json({
@@ -23,6 +28,7 @@ app.get("/", async (request, response) => {
 });
 
 app.use(express.static(path.join(__dirname, "public")));
+
 app.get("/todos", async (request, response) => {
   console.log("Todo List");
   try {
