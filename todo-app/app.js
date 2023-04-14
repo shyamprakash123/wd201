@@ -1,7 +1,7 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable no-undef */
 const express = require("express");
-var csrf = require("csurf");
+var csrf = require("tiny-csrf");
 const app = express();
 var cookieParser = require("cookie-parser");
 const { Todo } = require("./models");
@@ -14,7 +14,7 @@ app.use(express.urlencoded({ extended: false }));
 
 app.use(cookieParser("shh! some secret string"));
 
-app.use(csrf({ cookie: true }));
+app.use(csrf("this_should_be_32_character_long", ["POST", "PUT", "DELETE"]));
 
 app.set("view engine", "ejs");
 
