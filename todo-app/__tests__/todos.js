@@ -64,7 +64,7 @@ describe("Todo test suite", () => {
     expect(parsedUpdateResponse.completed).toBe(true);
   });
 
-  test("mark a todo as incomplete", async () => {
+  test("marking an item as incomplete", async () => {
     let res = await agent.get("/");
     let csrfToken = extractCsrfToken(res);
 
@@ -103,7 +103,7 @@ describe("Todo test suite", () => {
     expect(parsedUpdateResponse.completed).toBe(false);
   });
 
-  test("delete a todo", async () => {
+  test("deleting a todo", async () => {
     let res = await agent.get("/");
     let csrfToken = extractCsrfToken(res);
 
