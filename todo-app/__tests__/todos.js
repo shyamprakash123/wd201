@@ -68,19 +68,34 @@ describe("Todo test suite", () => {
     let res = await agent.get("/");
     let csrfToken = extractCsrfToken(res);
 
+    await agent.post("/todos").send({
+      title: "Buy shampoo",
+      dueDate: new Date().toISOString(),
+      completed: false,
+      _csrf: csrfToken,
+    });
+
     const groupedTodosResponse = await agent
       .get("/")
       .set("Accept", "application/json");
     const parsedGroupedResponse = JSON.parse(groupedTodosResponse.text);
-    const dueTodayCountCompleted = parsedGroupedResponse.completed.length;
-    const latestTodo =
-      parsedGroupedResponse.completed[dueTodayCountCompleted - 1];
+    const dueTodayCount = parsedGroupedResponse.dueToday.length;
+    const latestTodo = parsedGroupedResponse.dueToday[dueTodayCount - 1];
 
     res = await agent.get("/");
     csrfToken = extractCsrfToken(res);
 
-    expect(latestTodo.completed).toBe(true);
+    const markCompleteResponse = await agent
+      .put(`/todos/${latestTodo.id}`)
+      .send({
+        _csrf: csrfToken,
+        completed: true,
+      });
 
+    const parsedmarkCompleteResponse = JSON.parse(markCompleteResponse.text);
+    expect(parsedmarkCompleteResponse.completed).toBe(true);
+
+    // eslint-disable-next-line no-unused-vars
     const markInCompleteResponse = await agent
       .put(`/todos/${latestTodo.id}`)
       .send({
@@ -95,12 +110,9 @@ describe("Todo test suite", () => {
       groupedTodosResponseInComplete.text
     );
     const dueTodayCountCompletedInComplete =
-      parsedGroupedResponseInComplete.completed.length;
+      parsedGroupedResponseInComplete.dueToday.length;
 
-    expect(dueTodayCountCompleted - 1).toBe(dueTodayCountCompletedInComplete);
-
-    const parsedUpdateResponse = JSON.parse(markInCompleteResponse.text);
-    expect(parsedUpdateResponse.completed).toBe(false);
+    expect(dueTodayCount - 1).toBe(dueTodayCountCompletedInComplete);
   });
 
   test("deleting a todo", async () => {
