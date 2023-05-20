@@ -7,54 +7,6 @@
     <meta name="csrf-token" content="<%= csrfToken %>">
     <link href="./css/styles.css" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        var token= document
-        .querySelector('meta[name="csrf-token"]')
-        .getAttribute("content");
-        function updateTodo(id,val) {
-            fetch(`/todos/${id}`, {
-      method: "put", // or 'PUT'
-      headers: {
-        "Content-Type": "application/json",
-        
-      },
-      body:JSON.stringify({
-            "_csrf":token,
-            completed:val
-        })
-    }).then((res) => {
-        if(res.ok){
-            window.location.reload();
-        }
-    })
-    .catch((err) => {
-        console.error(err);
-    })
-        }
-
-
-    function deleteTodo(id){
-        fetch(`/todos/${id}`, {
-      method: "delete", // or 'PUT'
-      headers: {
-        "Content-Type": "application/json",
-        
-      },
-      body:JSON.stringify({
-            "_csrf":token
-        })
-    }).then((res) => {
-        if(res.ok){
-            window.location.reload();
-        }
-    })
-    .catch((err) => {
-        console.error(err);
-    })
-        }
-    
-    
-    </script>
     <title>To-do Manager</title>
 </head>
 <body>
@@ -62,7 +14,7 @@
     <div class="grid grid-cols-6">
         <div class="col-start-3 col-span-2">
             <%- include('header.ejs') %>
-            <form action="/todos" method="post">
+            <!-- <form action="/todos" method="post">
                 <input type="hidden" name="_csrf" value="<%= csrfToken %>"/>
                 <div class="flex gap-2 py-4">
                     <div class="flex-auto">
@@ -75,13 +27,15 @@
                         <button type="submit" class="bg-green-600 text-white px-5 py-1.5 rounded font-medium mr-2 mb-2">Add</button>
                     </div>
                 </div>
-        </form>
-        <div>
-            <%- include('todos.ejs',{title:"Overdue",data:overDue}) %>
+        </form> -->
+        <!-- <%- include('header.ejs') %> -->
+            <!-- <%- include('todos.ejs',{title:"Overdue",data:overDue}) %>
             <%- include('todos.ejs',{title:"Due Today",data:dueToday}) %>
             <%- include('todos.ejs',{title:"Due Later",data:dueLater}) %>
-            <%- include('todos.ejs',{title:"Completed Items",data:completed}) %>
-        </div>
+            <%- include('todos.ejs',{title:"Completed Items",data:completed}) %> -->
+            <p class="py-2">Welcome to the TO-DO manager</p>
+            <p class="py-2">New here? <a href="/signup" class="text-green-600">Sign-up now</a></p>
+            <p class="py-2">Already have an account? <a href="/login" class="text-green-600">Sign-in</a></p>
         
         </div>
     </div>
