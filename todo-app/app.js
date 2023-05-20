@@ -237,7 +237,8 @@ app.put(
 app.delete("/todos/:id", async (request, response) => {
   console.log("Delete a todo by ID:", request.params.id);
   try {
-    await Todo.remove(request.params.id);
+    const loggedInUser = request.user.id;
+    await Todo.remove(request.params.id, loggedInUser);
     return response.json({ success: true });
   } catch (err) {
     return response.status(422).json(err);
