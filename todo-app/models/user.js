@@ -1,5 +1,5 @@
 "use strict";
-const { Model } = require("sequelize");
+const { Model, where } = require("sequelize");
 module.exports = (sequelize, DataTypes) => {
   class User extends Model {
     /**
@@ -12,6 +12,14 @@ module.exports = (sequelize, DataTypes) => {
         foreignKey: "userId",
       });
       // define association here
+    }
+
+    static getUserName(id) {
+      return this.findAll({
+        where: {
+          id,
+        },
+      });
     }
   }
   User.init(

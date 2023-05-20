@@ -36,6 +36,13 @@
                 <button type="submit" class="text-white bg-green-600 hover:bg-green-800 font-medium rounded px-5 py-2">Sign up</button>
                 </div>
             </form>
+            <div style="margin-bottom: 20px">
+        <% if(messages && messages.error && messages.error.length > 0)  { %>
+        <% for(var i=0; i<messages.error.length; i++) { %>
+        <li style="color: red;"> <%= messages.error[i] %></li>
+        <% } %>
+        <% } %>
+        </div>
         </div>
     </div>
 </body>

@@ -3,16 +3,19 @@
 const express = require("express");
 var csrf = require("tiny-csrf");
 const app = express();
+const flash = require("connect-flash");
 var cookieParser = require("cookie-parser");
 const { Todo, User } = require("./models");
 const bodyParser = require("body-parser");
 const path = require("path");
-
+app.set("views", path.join(__dirname, "views"));
+app.use(flash());
 const passport = require("passport");
 const connectEnsureLogin = require("connect-ensure-login");
 const session = require("express-session");
 const LocalStrategy = require("passport-local");
 const bcrypt = require("bcrypt");
+const { where } = require("sequelize");
 const saltRounds = 10;
 
 app.use(bodyParser.json());
@@ -36,6 +39,11 @@ app.use(
   })
 );
 
+app.use(function (request, response, next) {
+  response.locals.messages = request.flash();
+  next();
+});
+
 app.use(passport.initialize());
 app.use(passport.session());
 
@@ -52,11 +60,11 @@ passport.use(
           if (result) {
             return done(null, user);
           } else {
-            return done("Invalid Password");
+            return done(null, false, { message: "Invalid password" });
           }
         })
         .catch((error) => {
-          return error;
+          return done(null, false, { message: "Invalid credentials" });
         });
     }
   )
@@ -92,6 +100,7 @@ app.get(
     const dueToday = await Todo.getDueToday(loggedInUser);
     const dueLater = await Todo.getDueLater(loggedInUser);
     const completed = await Todo.getCompleted(loggedInUser);
+    const username = await User.getUserName(request.user.id);
 
     if (request.accepts("html")) {
       response.render("todos", {
@@ -99,6 +108,7 @@ app.get(
         dueToday,
         dueLater,
         completed,
+        username,
         csrfToken: request.csrfToken(),
       });
     } else {
@@ -107,34 +117,11 @@ app.get(
         dueToday,
         dueLater,
         completed,
+        username,
       });
     }
   }
 );
-
-// app.get("/", async (request, response) => {
-//   const overDue = await Todo.getOverDue();
-//   const dueToday = await Todo.getDueToday();
-//   const dueLater = await Todo.getDueLater();
-//   const completed = await Todo.getCompleted();
-
-//   if (request.accepts("html")) {
-//     response.render("index", {
-//       overDue,
-//       dueToday,
-//       dueLater,
-//       completed,
-//       csrfToken: request.csrfToken(),
-//     });
-//   } else {
-//     response.json({
-//       overDue,
-//       dueToday,
-//       dueLater,
-//       completed,
-//     });
-//   }
-// });
 
 app.get("/todos", async (request, response) => {
   console.log("Todo List");
@@ -170,7 +157,10 @@ app.get("/signout", async (request, response, next) => {
 
 app.post(
   "/session",
-  passport.authenticate("local", { failureRedirect: "/login" }),
+  passport.authenticate("local", {
+    failureRedirect: "/login",
+    failureFlash: true,
+  }),
   async (request, response) => {
     response.redirect("/todos");
   }
@@ -178,21 +168,46 @@ app.post(
 
 app.post("/users", async (request, response) => {
   const hasedPwd = await bcrypt.hash(request.body.password, saltRounds);
+  let flag = true;
+  if (request.body.firstName.length == 0) {
+    request.flash("error", "First Name should not be empty!");
+    flag = false;
+  }
+  if (request.body.lastName.length == 0) {
+    request.flash("error", "Last Name should not be empty!");
+    flag = false;
+  }
+  if (request.body.email == 0) {
+    request.flash("error", "Email should not be empty!");
+    flag = false;
+  }
+  if (request.body.password == 0) {
+    request.flash("error", "Password should not be empty!");
+    flag = false;
+  }
   try {
-    const users = await User.create({
-      firstName: request.body.firstName,
-      lastName: request.body.lastName,
-      email: request.body.email,
-      password: hasedPwd,
-    });
-    request.login(users, (err) => {
-      if (err) {
-        console.error(err);
-      }
-      response.redirect("/todos");
-    });
+    if (flag == true) {
+      const users = await User.create({
+        firstName: request.body.firstName,
+        lastName: request.body.lastName,
+        email: request.body.email,
+        password: hasedPwd,
+      });
+
+      request.login(users, (err) => {
+        if (err) {
+          console.error(err);
+          request.flash("error", err);
+        }
+        response.redirect("/todos");
+      });
+    } else {
+      response.redirect("/signup");
+    }
   } catch (err) {
     console.error(err);
+    request.flash("error", "Account Already exists");
+    response.redirect("/signup");
   }
 });
 
@@ -202,12 +217,23 @@ app.post(
   async (request, response) => {
     console.log("Creating a todo", request.body, request.user.id);
     try {
-      const todo = await Todo.addTodo({
-        title: request.body.title,
-        dueDate: request.body.dueDate,
-        completed: false,
-        userId: request.user.id,
-      });
+      if (request.body.title.length == 0) {
+        request.flash("error", "Please enter Todo-name");
+      } else if (request.body.title.length < 5) {
+        request.flash("error", "Todo-name length must be minimum 5 characters");
+      }
+      if (request.body.dueDate == 0) {
+        request.flash("error", "Please enter dueDate");
+      }
+      if (request.body.title.length >= 5 && request.body.dueDate.length > 0) {
+        const todo = await Todo.addTodo({
+          title: request.body.title,
+          dueDate: request.body.dueDate,
+          completed: false,
+          userId: request.user.id,
+        });
+        request.flash("success", "New Todo is Added");
+      }
       return response.redirect("/todos");
     } catch (error) {
       console.error(error);
@@ -246,7 +272,3 @@ app.delete("/todos/:id", async (request, response) => {
 });
 
 module.exports = app;
-
-// app.listen(3000, () => {
-//   console.log("server started on port 3000");
-// });
