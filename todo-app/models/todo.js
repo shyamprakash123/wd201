@@ -13,11 +13,12 @@ module.exports = (sequelize, DataTypes) => {
       // define association here
     }
 
-    static addTodo({ title, dueDate, completed }) {
+    static addTodo({ title, dueDate, completed, userId }) {
       return this.create({
         title: title,
         dueDate: dueDate,
         completed: completed,
+        userId,
       });
     }
 
@@ -25,33 +26,36 @@ module.exports = (sequelize, DataTypes) => {
       return this.findAll();
     }
 
-    static getOverDue() {
+    static getOverDue(userId) {
       return this.findAll({
         where: {
           completed: false,
           dueDate: {
             [Op.lt]: today,
           },
+          userId,
         },
       });
     }
 
-    static getDueToday() {
+    static getDueToday(userId) {
       return this.findAll({
         where: {
           dueDate: today,
           completed: false,
+          userId,
         },
       });
     }
 
-    static getDueLater() {
+    static getDueLater(userId) {
       return this.findAll({
         where: {
           completed: false,
           dueDate: {
             [Op.gt]: today,
           },
+          userId,
         },
       });
     }
@@ -64,10 +68,11 @@ module.exports = (sequelize, DataTypes) => {
       });
     }
 
-    static async getCompleted() {
+    static async getCompleted(userId) {
       return this.findAll({
         where: {
           completed: true,
+          userId,
         },
       });
     }
