@@ -247,12 +247,22 @@ app.put(
   connectEnsureLogin.ensureLoggedIn(),
   async (request, response) => {
     console.log("we have to update a todo with ID:", request.params.id);
-    const todo = await Todo.findByPk(request.params.id);
+    const loggedInUser = request.user.id;
+    const todo = await Todo.findOne({
+      where: {
+        id: request.params.id,
+        userId: loggedInUser,
+      },
+    });
     try {
-      const updatedTodo = await todo.setCompletionStatus(
-        request.body.completed
-      );
-      return response.json(updatedTodo);
+      if (todo != null) {
+        const updatedTodo = await todo.setCompletionStatus(
+          request.body.completed
+        );
+        return response.json(updatedTodo);
+      } else {
+        return response.status(422).json(updatedTodo);
+      }
     } catch (err) {
       console.error(err);
       return response.status(422).json(updatedTodo);
@@ -264,8 +274,12 @@ app.delete("/todos/:id", async (request, response) => {
   console.log("Delete a todo by ID:", request.params.id);
   try {
     const loggedInUser = request.user.id;
-    await Todo.remove(request.params.id, loggedInUser);
-    return response.json({ success: true });
+    let res = await Todo.remove(request.params.id, loggedInUser);
+    if (res == 1) {
+      return response.json({ success: true });
+    } else {
+      return response.status(422).json(res);
+    }
   } catch (err) {
     return response.status(422).json(err);
   }

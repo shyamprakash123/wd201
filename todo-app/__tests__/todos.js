@@ -5,7 +5,7 @@ var cheerio = require("cheerio");
 const db = require("../models/index");
 const app = require("../app");
 
-let server, agent;
+let server, agent, latestTodo;
 function extractCsrfToken(res) {
   var $ = cheerio.load(res.text);
   return $("[name=_csrf]").val();
@@ -33,12 +33,25 @@ describe("Todo test suite", () => {
   });
 
   test("Sign up", async () => {
+    // signup user A
     let res = await agent.get("/signup");
-    const csrfToken = extractCsrfToken(res);
+    let csrfToken = extractCsrfToken(res);
     res = await agent.post("/users").send({
       firstName: "Test",
       lastName: "User A",
       email: "userA@gmail.com",
+      password: "1234",
+      _csrf: csrfToken,
+    });
+    expect(res.statusCode).toBe(302);
+
+    // signup user B
+    res = await agent.get("/signup");
+    csrfToken = extractCsrfToken(res);
+    res = await agent.post("/users").send({
+      firstName: "Test",
+      lastName: "User B",
+      email: "userB@gmail.com",
       password: "1234",
       _csrf: csrfToken,
     });
@@ -184,5 +197,50 @@ describe("Todo test suite", () => {
       _csrf: csrfToken,
     });
     expect(deletedResponse.statusCode).toBe(200);
+  });
+
+  test("Test for verifying user A cannot delete a todo-item in user B", async () => {
+    //signin user B
+    agent = request.agent(server);
+    await login(agent, "userB@gmail.com", "1234");
+
+    //creating a Todo Item with user B
+    res1 = await agent.get("/todos");
+    csrfToken = extractCsrfToken(res1);
+    await agent.post("/todos").send({
+      title: "Buy csn",
+      dueDate: new Date().toISOString(),
+      completed: false,
+      _csrf: csrfToken,
+    });
+
+    //Getting latest added todo-item in user B
+    const groupedTodosResponse = await agent
+      .get("/todos")
+      .set("Accept", "application/json");
+    const parsedGroupedResponse = JSON.parse(groupedTodosResponse.text);
+    const dueTodayCount = parsedGroupedResponse.dueToday.length;
+    const latestTodo = parsedGroupedResponse.dueToday[dueTodayCount - 1];
+
+    //signout user B
+    let res = await agent.get("/todos");
+    expect(res.statusCode).toBe(200);
+    res = await agent.get("/signout");
+    expect(res.statusCode).toBe(302);
+    res = await agent.get("/todos");
+    expect(res.statusCode).toBe(302);
+
+    //signin user A
+    agent = request.agent(server);
+    await login(agent, "userA@gmail.com", "1234");
+
+    res = await agent.get("/todos");
+    csrfToken = extractCsrfToken(res);
+
+    // Deleting latest todo-item of user B from user A
+    const deletedResponse = await agent.delete(`/todos/${latestTodo.id}`).send({
+      _csrf: csrfToken,
+    });
+    expect(deletedResponse.statusCode).toBe(422);
   });
 });

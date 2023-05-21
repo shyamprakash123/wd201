@@ -62,12 +62,13 @@
     <div class="grid grid-cols-6">
         <div class="col-start-3 col-span-2">
             <%- include('header.ejs') %>
-            <a style="color: blueviolet;" href="/signout">Signout</a>
-            <a style="color: darkgreen; font-weight: bold;" href="/">Home Page</a>
+            <div>
+                <a style="color: blueviolet;" href="/signout">Signout</a>
             <div style="float: right;";">
                 <h2 style="color:chocolate; font-weight: bold;">
                     <%= "User Name:"+username[0].firstName+" "+username[0].lastName %>
                 </h2>
+            </div>
             </div>
             <form action="/todos" method="post">
                 <input type="hidden" name="_csrf" value="<%= csrfToken %>"/>
