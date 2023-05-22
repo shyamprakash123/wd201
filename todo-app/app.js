@@ -101,7 +101,7 @@ app.get(
     const dueLater = await Todo.getDueLater(loggedInUser);
     const completed = await Todo.getCompleted(loggedInUser);
     const username = await User.getUserName(request.user.id);
-
+    console.log("-------------"+username);
     if (request.accepts("html")) {
       response.render("todos", {
         overDue,
@@ -123,16 +123,16 @@ app.get(
   }
 );
 
-app.get("/todos", async (request, response) => {
-  console.log("Todo List");
-  try {
-    const users = await Todo.findAll();
-    return response.json(users);
-  } catch (err) {
-    console.error(err);
-    return response.status(422).json(users);
-  }
-});
+// app.get("/todos", async (request, response) => {
+//   console.log("Todo List");
+//   try {
+//     const users = await Todo.findAll();
+//     return response.json(users);
+//   } catch (err) {
+//     console.error(err);
+//     return response.status(422).json(users);
+//   }
+// });
 
 app.get("/signup", async (request, response) => {
   response.render("signup", {
