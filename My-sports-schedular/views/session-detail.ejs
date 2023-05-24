@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body {
+  font-family: sans-serif;
+  background: white;
+}
+
+.users:hover .trash-icon {
+  display: block;
+}
+
+.users {
+  -webkit-user-select: none; /* Safari */
+  -ms-user-select: none; /* IE 10 and IE 11 */
+  user-select: none; /* Standard syntax */
+}
+</style>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <title><%= sport[0].sports_name %>-Session</title>
+</head>
+<body>
+    <h1><%= sport[0].sports_name %> Session #<%= sport[0].id %></h1>
+    <h3>This session is scheduled for <%= session[0].dateTime %>, to be played at "<%= session[0].place %>"</h3>
+    <h3>Players</h3>
+    <% if(session.length > 0){ %>
+        <ul class="list-none">
+                <% for(var i=0; i < session[0].members.length; i++) { %>
+                <li class="users">
+                    <div class="flex items-center w-fit my-2 px-2 py-1 rounded hover:bg-purple-50">
+                        <h3><%= session[0].members[i] %></h3>
+                        <a href="#" class="hidden trash-icon ml-2" onclick="">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0" />
+                            </svg>
+                        </a>
+                    </div>
+                </li>
+                <% } %>
+            </ul>
+            <% } %>
+            <!--  -->
+            <% if(players.length > 0){ %>
+        <ul class="list-none">
+                <% for(var i=0; i < players[i].length; i++) { %>
+                <li class="users">
+                    <div class="flex items-center w-fit my-2 px-2 py-1 rounded hover:bg-purple-50">
+                        <h3><%= players[i].userName %></h3>
+                        <a href="#" class="hidden trash-icon ml-2" onclick="">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0" />
+                            </svg>
+                        </a>
+                    </div>
+                </li>
+                <% } %>
+            </ul>
+            <% } %>
+
+            <% if(session[0].members.length==0 && players.length==0){ %>
+                <h2>There are no players available in this session. Join?</h2>
+            <% } %>
+                <% if(session[0].userId==userId){ %>
+                    <div>
+                    <a href="">Edit session</a>
+                    <a href="">Cancel session</a>
+                </div>
+                <% }else{ %>
+                    <div>
+                        <a href="">Join this session</a>
+                    </div>
+
+                    <% } %>
+        
+
+</body>
+</html>

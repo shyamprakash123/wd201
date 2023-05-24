@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <title><%= sport[0].sports_name %></title>
+</head>
+<body>
+    <h1><%= sport[0].sports_name %></h1>
+    <h3>Sessions</h3>
+    <% if(session.length > 0){ %>
+        <ul class="list-none">
+                <% for(var i=0; i < session.length; i++) { %>
+                <li>
+                    <div class="flex items-center w-fit my-2 px-2 py-1 rounded hover:bg-purple-50">
+                        <a href="/sports/<%= sport[0].sports_name %>/<%= session[i].id %>"><%= session[i].dateTime %></a>
+                    </div>
+                </li>
+                <% } %>
+            </ul>
+            <% }else{ %>
+                <h2>There are no sessions available to join right now. Create one?</h2>
+                <% } %>
+                <div>
+                    <a href="/sports/<%= sport[0].sports_name %>/new-session">Create a new session</a>
+                    <a href="">View previous sessions</a>
+                </div>
+        
+
+</body>
+</html>

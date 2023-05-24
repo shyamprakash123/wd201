@@ -1,4 +1,3 @@
-/* eslint-disable no-unused-vars */
 "use strict";
 const { Model } = require("sequelize");
 module.exports = (sequelize, DataTypes) => {
@@ -9,15 +8,48 @@ module.exports = (sequelize, DataTypes) => {
      * The `models/index` file will call this method automatically.
      */
     static associate(models) {
+      Sessions.belongsTo(models.Sports, {
+        foreignKey: "sportId",
+      });
       // define association here
+    }
+
+    static getSessionBySId(sportId) {
+      return this.findAll({
+        where: {
+          sportId: sportId,
+        },
+      });
+    }
+
+    static getSessionById(id) {
+      return this.findAll({
+        where: {
+          id,
+        },
+      });
+    }
+
+    static newSession(date, place, members, players, userId, sportId) {
+      return this.create({
+        dateTime: date,
+        place: place,
+        members: members,
+        players: players,
+        userId: userId,
+        sportId: sportId,
+        isCanceled: false,
+      });
     }
   }
   Sessions.init(
     {
-      session_date: DataTypes.DATE,
-      session_place: DataTypes.STRING,
-      session_members: DataTypes.STRING,
-      session_players: DataTypes.INTEGER,
+      dateTime: DataTypes.DATE,
+      place: DataTypes.STRING,
+      members: DataTypes.ARRAY(DataTypes.STRING),
+      players: DataTypes.INTEGER,
+      userId: DataTypes.INTEGER,
+      isCanceled: DataTypes.BOOLEAN,
     },
     {
       sequelize,

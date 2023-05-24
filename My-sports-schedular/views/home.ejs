@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="<%= csrfToken %>">
+    <script src="https://cdn.tailwindcss.com"></script>
     <title>My-Sports-Schedular</title>
 </head>
 <body>
@@ -14,14 +16,14 @@
         <% if(user[0].role=="admin"){ %>
             <div>
                 <h3>Administrative Actions</h3>
-            <a href="/home/new-sport">Create a new sport</a> <br>
+            <a href="/sports/new-sport">Create a new sport</a> <br>
             <a href="/reports">View reports</a>
             </div>
             <% } %>
             <div style="margin: 50px;">
                 <% if(sports.length > 0) { %>
             <% for(var i=0; i < sports.length;i++){ %>
-                <a href="/sports/<%=sports[i].id%>"><%=sports[i].sports_name %></a>
+                <a href="/sports/<%=sports[i].sports_name%>"><%=sports[i].sports_name %></a>
             <% } } else { %>
                 <h2>There are no sports available for scheduling a session</h2>
                 <% } %>

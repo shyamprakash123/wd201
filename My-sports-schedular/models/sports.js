@@ -9,9 +9,19 @@ module.exports = (sequelize, DataTypes) => {
      * The `models/index` file will call this method automatically.
      */
     static associate(models) {
+      Sports.hasMany(models.Sessions, {
+        foreignKey: "sportId",
+      });
       // define association here
     }
 
+    static getSportByName(name) {
+      return this.findAll({
+        where: {
+          sports_name: name,
+        },
+      });
+    }
     static getAllSports() {
       return this.findAll();
     }

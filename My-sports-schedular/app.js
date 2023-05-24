@@ -5,7 +5,7 @@ var csrf = require("tiny-csrf");
 const app = express();
 const flash = require("connect-flash");
 var cookieParser = require("cookie-parser");
-const { User, Sports } = require("./models");
+const { User, Sports, Sessions, Players } = require("./models");
 const bodyParser = require("body-parser");
 const path = require("path");
 app.set("views", path.join(__dirname, "views"));
@@ -16,6 +16,7 @@ const session = require("express-session");
 const LocalStrategy = require("passport-local");
 const bcrypt = require("bcrypt");
 const { where } = require("sequelize");
+const players = require("./models/players");
 const saltRounds = 10;
 
 app.use(bodyParser.json());
@@ -137,7 +138,7 @@ app.post("/users", async (request, response) => {
           console.error(err);
           request.flash("error", err);
         }
-        response.redirect("/home");
+        response.redirect("/sports");
       });
     } else {
       response.redirect("/signup");
@@ -156,12 +157,12 @@ app.post(
     failureFlash: true,
   }),
   async (request, response) => {
-    response.redirect("/home");
+    response.redirect("/sports");
   }
 );
 
 app.get(
-  "/home",
+  "/sports",
   connectEnsureLogin.ensureLoggedIn(),
   async (request, response) => {
     const loggedInUser = request.user.id;
@@ -176,7 +177,7 @@ app.get(
 );
 
 app.get(
-  "/home/new-sport",
+  "/sports/new-sport",
   connectEnsureLogin.ensureLoggedIn(),
   async (request, response) => {
     response.render("new-sport", {
@@ -186,7 +187,7 @@ app.get(
 );
 
 app.post(
-  "/home/new-sport",
+  "/sports/new-sport",
   connectEnsureLogin.ensureLoggedIn(),
   async (request, response) => {
     const adminId = request.user.id;
@@ -195,7 +196,97 @@ app.post(
       if (admin[0].role == "admin") {
         const sport = await Sports.addNewSport(request.body.sportName, adminId);
       }
-      response.redirect("/home");
+      response.redirect("/sports");
+    } catch (err) {
+      return response.status(422).json(err);
+    }
+  }
+);
+
+app.get(
+  "/sports/:name",
+  connectEnsureLogin.ensureLoggedIn(),
+  async (request, response) => {
+    const sport = await Sports.getSportByName(request.params.name);
+    const session = await Sessions.getSessionBySId(sport[0].id);
+    response.render("sessions", {
+      sport,
+      session,
+      csrfToken: request.csrfToken(),
+    });
+  }
+);
+
+app.get(
+  "/sports/:name/new-session",
+  connectEnsureLogin.ensureLoggedIn(),
+  async (request, response) => {
+    const sport = await Sports.getSportByName(request.params.name);
+    const session = await Sessions.getSessionBySId(sport[0].id);
+    response.render("new-session", {
+      sport,
+      session,
+      csrfToken: request.csrfToken(),
+    });
+  }
+);
+
+app.post(
+  "/sports/:name",
+  connectEnsureLogin.ensureLoggedIn(),
+  async (request, response) => {
+    const userId = request.user.id;
+    const date = request.body.dateTime;
+    const place = request.body.place;
+    const members = request.body.members.split(",");
+    const players = request.body.players;
+    const sportId = request.body.sportId;
+    try {
+      const session = await Sessions.newSession(
+        date,
+        place,
+        members,
+        Number(players),
+        userId,
+        sportId
+      );
+      response.redirect("/sports");
+    } catch (err) {
+      return response.status(422).json(err);
+    }
+  }
+);
+
+app.get(
+  "/sports/:name/:id",
+  connectEnsureLogin.ensureLoggedIn(),
+  async (request, response) => {
+    const sessionId = request.params.id;
+    const sport = await Sports.getSportByName(request.params.name);
+    const session = await Sessions.getSessionById(sessionId);
+    const players = await Players.getPlayersBySId(sessionId);
+    const userId = request.user.id;
+    response.render("session-detail", {
+      sport,
+      session,
+      players,
+      userId,
+      csrfToken: request.csrfToken(),
+    });
+  }
+);
+
+app.post(
+  "/sports/:name/:id",
+  connectEnsureLogin.ensureLoggedIn(),
+  async (request, response) => {
+    const name = request.params.name;
+    const userId = request.user.id;
+    const sessionId = request.params.id;
+    const userName = request.user.firstName + " " + request.user.lastName;
+    try {
+      const player = await Players.addPlayers(userId, sessionId, userName);
+      response.redirect(`/sports/${name}/${sessionId}`);
     } catch (err) {
       return response.status(422).json(err);
     }
