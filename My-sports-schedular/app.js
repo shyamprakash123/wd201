@@ -2,6 +2,7 @@
 /* eslint-disable no-undef */
 const express = require("express");
 var csrf = require("tiny-csrf");
+var format = require("date-format");
 const app = express();
 const flash = require("connect-flash");
 var cookieParser = require("cookie-parser");
@@ -191,12 +192,13 @@ app.post(
   connectEnsureLogin.ensureLoggedIn(),
   async (request, response) => {
     const adminId = request.user.id;
+    const sportName = request.body.sportName;
     try {
       const admin = await User.getUser(adminId);
       if (admin[0].role == "admin") {
-        const sport = await Sports.addNewSport(request.body.sportName, adminId);
+        const sport = await Sports.addNewSport(sportName, adminId);
       }
-      response.redirect("/sports");
+      response.redirect(`/sports/${sportName}`);
     } catch (err) {
       return response.status(422).json(err);
     }
@@ -235,12 +237,14 @@ app.post(
   "/sports/:name",
   connectEnsureLogin.ensureLoggedIn(),
   async (request, response) => {
+    const sportName = request.params.name;
     const userId = request.user.id;
     const date = request.body.dateTime;
     const place = request.body.place;
     const members = request.body.members.split(",");
     const players = request.body.players;
     const sportId = request.body.sportId;
+    const userName = request.user.firstName + " " + request.user.lastName;
     try {
       const session = await Sessions.newSession(
         date,
@@ -250,7 +254,8 @@ app.post(
         userId,
         sportId
       );
-      response.redirect("/sports");
+      const player = await Players.addPlayers(userId, session.id, userName);
+      response.redirect(`/sports/${sportName}/${session.id}`);
     } catch (err) {
       return response.status(422).json(err);
     }
@@ -266,18 +271,21 @@ app.get(
     const session = await Sessions.getSessionById(sessionId);
     const players = await Players.getPlayersBySId(sessionId);
     const userId = request.user.id;
+    const current = await Players.getPlayersByIdS(userId, sessionId);
+    let isJoined = current.length == 1;
     response.render("session-detail", {
       sport,
       session,
       players,
       userId,
+      isJoined,
       csrfToken: request.csrfToken(),
     });
   }
 );
 
 app.post(
-  "/sports/:name/:id",
+  "/sports/addPlayer/:name/:id",
   connectEnsureLogin.ensureLoggedIn(),
   async (request, response) => {
     const name = request.params.name;
@@ -286,7 +294,104 @@ app.post(
     const userName = request.user.firstName + " " + request.user.lastName;
     try {
       const player = await Players.addPlayers(userId, sessionId, userName);
-      response.redirect(`/sports/${name}/${sessionId}`);
+      return response.json({ success: true });
+    } catch (err) {
+      return response.status(422).json(err);
+    }
+  }
+);
+
+app.delete(
+  "/sports/addPlayer/:name/:id",
+  connectEnsureLogin.ensureLoggedIn(),
+  async (request, response) => {
+    const name = request.params.name;
+    const userId = request.user.id;
+    const sessionId = request.params.id;
+    try {
+      const player = await Players.deletePlayers(userId, sessionId);
+      return response.json({ success: true });
+    } catch (err) {
+      return response.status(422).json(err);
+    }
+  }
+);
+
+app.delete(
+  "/sports/deletePlayer/:name/:id",
+  connectEnsureLogin.ensureLoggedIn(),
+  async (request, response) => {
+    const name = request.params.name;
+    const userId = request.body.userId;
+    const sessionId = request.params.id;
+    try {
+      const player = await Players.deletePlayers(userId, sessionId);
+      return response.json({ success: true });
+    } catch (err) {
+      return response.status(422).json(err);
+    }
+  }
+);
+
+app.delete(
+  "/sports/deleteMember/:name/:id",
+  connectEnsureLogin.ensureLoggedIn(),
+  async (request, response) => {
+    const name = request.params.name;
+    const memberId = request.body.memberId;
+    const sessionId = request.params.id;
+    const members = await Sessions.getSessionById(sessionId);
+    members[0].members.splice(memberId, 1);
+    try {
+      const player = await Sessions.deleteMember(members[0].members, sessionId);
+      return response.json({ success: true });
+    } catch (err) {
+      return response.status(422).json(err);
+    }
+  }
+);
+
+app.get(
+  "/sports/editsession/:name/:id",
+  connectEnsureLogin.ensureLoggedIn(),
+  async (request, response) => {
+    const sportName = request.params.name;
+    const session = await Sessions.getSessionById(request.params.id);
+    const userId = request.user.id;
+    const date = new Date();
+    if (session[0].userId == userId) {
+      response.render("editSession", {
+        date,
+        sportName,
+        session,
+        userId,
+        csrfToken: request.csrfToken(),
+      });
+    } else {
+      response.render("pageNotFound");
+    }
+  }
+);
+
+app.post(
+  "/sports/editsession/:name/:id",
+  connectEnsureLogin.ensureLoggedIn(),
+  async (request, response) => {
+    const sportName = request.params.name;
+    const date = request.body.dateTime;
+    const place = request.body.place;
+    const members = request.body.members.split(",");
+    const players = request.body.players;
+    const sessionId = request.params.id;
+    try {
+      const session = await Sessions.sessionUpdate(
+        date,
+        place,
+        members,
+        Number(players),
+        sessionId
+      );
+      response.redirect(`/sports/${sportName}/${sessionId}`);
     } catch (err) {
       return response.status(422).json(err);
     }

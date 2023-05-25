@@ -6,33 +6,32 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="<%= csrfToken %>">
     <script src="https://cdn.tailwindcss.com"></script>
-    <title><%= sport[0].sports_name %></title>
+    <title><%= sportName %></title>
 </head>
 <body>
     <div class="grid grid-cols-6">
         <div class="col-start-3 col-span-2">
-            <h6 class="py-4">New <%= sport[0].sports_name %> Session</h6>
-            <form action="/sports/<%= sport[0].sports_name %>" method="post">
+            <h6 class="py-4">Edit <%= sportName %> Session</h6>
+            <form action="/sports/editsession/<%= sportName %>/<%= session[0].id %>" method="post">
                 <input type="hidden" name="_csrf" value="<%= csrfToken %>">
-                <input type="hidden" name="sportId" value="<%= sport[0].id %>">
                 <div class="py-3">
                     <label for="dateTime">When will this sport session be held?</label>
-                <input type="datetime-local" name="dateTime" class="border border-gray-300 text-gray-900 rounded p-2 w-full" required>
+                <input type="datetime-local" min="<%= date.toISOString().slice(0, 16) %>" value="<%= session[0].dateTime.toISOString().slice(0, 16); %>" name="dateTime" class="border border-gray-300 text-gray-900 rounded p-2 w-full" required>
                 </div>
                 <div class="py-3">
                     <label for="place">Where will this session be played?</label>
-                <input type="text" name="place" class="border border-gray-300 text-gray-900 rounded p-2 w-full" required>
+                <input type="text" name="place" value="<%= session[0].place %>" class="border border-gray-300 text-gray-900 rounded p-2 w-full" required>
                 </div>
                 <div class="py-3">
                     <label for="members">who all will be joining you in this session?</label>
-                <input type="text" name="members" class="border border-gray-300 text-gray-900 rounded p-2 w-full" required>
+                <input type="text" name="members" value="<%= session[0].members %>" class="border border-gray-300 text-gray-900 rounded p-2 w-full" required>
                 </div>
                 <div class="py-3">
                     <label for="players">How many more players do you need?</label>
-                <input type="number" name="players" class="border border-gray-300 text-gray-900 rounded p-2 w-full" required>
+                <input type="number" name="players" value="<%= session[0].players %>" class="border border-gray-300 text-gray-900 rounded p-2 w-full" required>
                 </div>
                 <div class="py-3">
-                <button type="submit" class="text-white bg-green-600 hover:bg-green-800 font-medium rounded px-5 py-2">Create</button>
+                <button type="submit" class="text-white bg-green-600 hover:bg-green-800 font-medium rounded px-5 py-2">Update</button>
                 </div>
             </form>
             <div style="margin-bottom: 20px">

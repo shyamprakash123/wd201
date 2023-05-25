@@ -41,6 +41,35 @@ module.exports = (sequelize, DataTypes) => {
         isCanceled: false,
       });
     }
+
+    static deleteMember(members, sessionId) {
+      return this.update(
+        {
+          members: members,
+        },
+        {
+          where: {
+            id: sessionId,
+          },
+        }
+      );
+    }
+
+    static sessionUpdate(dateTime, place, members, players, sessionId) {
+      return this.update(
+        {
+          dateTime: dateTime,
+          place: place,
+          members: members,
+          players: players,
+        },
+        {
+          where: {
+            id: sessionId,
+          },
+        }
+      );
+    }
   }
   Sessions.init(
     {
