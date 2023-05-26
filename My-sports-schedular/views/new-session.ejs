@@ -17,7 +17,7 @@
                 <input type="hidden" name="sportId" value="<%= sport[0].id %>">
                 <div class="py-3">
                     <label for="dateTime">When will this sport session be held?</label>
-                <input type="datetime-local" name="dateTime" class="border border-gray-300 text-gray-900 rounded p-2 w-full" required>
+                <input type="datetime-local" min="<%= date.toISOString().slice(0, 16) %>" name="dateTime" class="border border-gray-300 text-gray-900 rounded p-2 w-full" required>
                 </div>
                 <div class="py-3">
                     <label for="place">Where will this session be played?</label>

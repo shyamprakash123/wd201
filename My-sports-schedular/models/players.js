@@ -45,6 +45,14 @@ module.exports = (sequelize, DataTypes) => {
         },
       });
     }
+
+    static getPlayersByUserId(userId) {
+      return this.findAll({
+        where: {
+          userId,
+        },
+      });
+    }
   }
   Players.init(
     {

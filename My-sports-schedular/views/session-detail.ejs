@@ -150,7 +150,12 @@
                         <% if(players[i].userId==userId){ %>
                             <h3>You</h3>
                         <% }else{ %>
-                            <h3><%= players[i].userName %></h3>
+                            <% if(session[0].userId==players[i].userId){ %>
+                                <h3><%= players[i].userName %></h3>
+                                <h3 class="ml-6 text-gray-400">(Organizer)</h3>
+                            <% }else{ %>
+                                <h3><%= players[i].userName %></h3>
+                            <% } %>
                             <% } %>
                         <% if(session[0].userId==userId){ %>
                             <a href="#" class="hidden trash-icon ml-2" onclick="deletePlayer(<%= players[i].userId %>)">
@@ -171,14 +176,18 @@
                 <% if(session[0].userId==userId){ %>
                     <div>
                     <a href="/sports/editsession/<%= sport[0].sports_name %>/<%= session[0].id %>">Edit session</a>
-                    <a href="">Cancel session</a>
+                    <a href="/sports/cancel-session/<%= session[0].id %>">Cancel session</a>
                 </div>
                 <% }else{ %>
                     <div>
                         <% if(isJoined == true){ %>
                            <button type="submit" onclick="removePlayer()" class="text-white bg-green-600 hover:bg-green-800 font-medium rounded px-5 py-2">Leave this session</button>
             <% }else{ %>
+                <% if(session[0].players==0){ %>
+                <button type="submit" class="text-white bg-green-300 font-medium rounded px-5 py-2">This session is full now</button>
+                <% }else{ %>
                 <button type="submit" onclick="addPlayer()" class="text-white bg-green-600 hover:bg-green-800 font-medium rounded px-5 py-2">Join this session</button>
+                <% } %>
             <% } %>
                     </div>
 

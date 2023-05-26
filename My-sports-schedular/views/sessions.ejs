@@ -9,13 +9,27 @@
 </head>
 <body>
     <h1><%= sport[0].sports_name %></h1>
-    <h3>Sessions</h3>
+    <h3>Upcoming Sessions</h3>
     <% if(session.length > 0){ %>
         <ul class="list-none">
                 <% for(var i=0; i < session.length; i++) { %>
                 <li>
                     <div class="flex items-center w-fit my-2 px-2 py-1 rounded hover:bg-purple-50">
-                        <a href="/sports/<%= sport[0].sports_name %>/<%= session[i].id %>"><%= session[i].dateTime %></a>
+                        <a class="text-base" href="/sports/<%= sport[0].sports_name %>/session/<%= session[i].id %>"><%= session[i].dateTime.toLocaleDateString('en-US',{
+                        year: 'numeric',
+                        month: 'long',
+                        day: 'numeric',
+                        hour: 'numeric',
+                        minute: 'numeric',
+                        hour12: true
+                        }) %></a>
+                         <% if(session[i].players==1){ %>
+                            <p class="text-base text-red-700 ml-5"> Last Slot</p>
+                        <% }else if(session[i].players==0){ %>
+                            <p class="text-base text-red-700 ml-5"> Fully Booked</p>
+                            <% }else{ %>
+                                <p class="text-base ml-5"><%= session[i].players+" slots" %></p>
+                            <% } %>
                     </div>
                 </li>
                 <% } %>

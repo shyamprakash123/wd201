@@ -18,6 +18,7 @@ const LocalStrategy = require("passport-local");
 const bcrypt = require("bcrypt");
 const { where } = require("sequelize");
 const players = require("./models/players");
+const { Session } = require("inspector");
 const saltRounds = 10;
 
 app.use(bodyParser.json());
@@ -225,7 +226,9 @@ app.get(
   async (request, response) => {
     const sport = await Sports.getSportByName(request.params.name);
     const session = await Sessions.getSessionBySId(sport[0].id);
+    const date = new Date();
     response.render("new-session", {
+      date,
       sport,
       session,
       csrfToken: request.csrfToken(),
@@ -250,12 +253,13 @@ app.post(
         date,
         place,
         members,
+        sportName,
         Number(players),
         userId,
         sportId
       );
       const player = await Players.addPlayers(userId, session.id, userName);
-      response.redirect(`/sports/${sportName}/${session.id}`);
+      response.redirect(`/sports/${sportName}/session/${session.id}`);
     } catch (err) {
       return response.status(422).json(err);
     }
@@ -263,7 +267,7 @@ app.post(
 );
 
 app.get(
-  "/sports/:name/:id",
+  "/sports/:name/session/:id",
   connectEnsureLogin.ensureLoggedIn(),
   async (request, response) => {
     const sessionId = request.params.id;
@@ -292,6 +296,11 @@ app.post(
     const userId = request.user.id;
     const sessionId = request.params.id;
     const userName = request.user.firstName + " " + request.user.lastName;
+    const player = await Sessions.getSessionById(sessionId);
+    const updatePlayers = await Sessions.updatePlayers(
+      player[0].players - 1,
+      sessionId
+    );
     try {
       const player = await Players.addPlayers(userId, sessionId, userName);
       return response.json({ success: true });
@@ -308,6 +317,11 @@ app.delete(
     const name = request.params.name;
     const userId = request.user.id;
     const sessionId = request.params.id;
+    const players = await Sessions.getSessionById(sessionId);
+    const updatePlayers = await Sessions.updatePlayers(
+      players[0].players + 1,
+      sessionId
+    );
     try {
       const player = await Players.deletePlayers(userId, sessionId);
       return response.json({ success: true });
@@ -324,6 +338,11 @@ app.delete(
     const name = request.params.name;
     const userId = request.body.userId;
     const sessionId = request.params.id;
+    const players = await Sessions.getSessionById(sessionId);
+    const updatePlayers = await Sessions.updatePlayers(
+      players[0].players + 1,
+      sessionId
+    );
     try {
       const player = await Players.deletePlayers(userId, sessionId);
       return response.json({ success: true });
@@ -391,7 +410,34 @@ app.post(
         Number(players),
         sessionId
       );
-      response.redirect(`/sports/${sportName}/${sessionId}`);
+      response.redirect(`/sports/${sportName}/session/${sessionId}`);
+    } catch (err) {
+      return response.status(422).json(err);
+    }
+  }
+);
+
+app.get(
+  "/sports/cancel-session/:id",
+  connectEnsureLogin.ensureLoggedIn(),
+  async (request, response) => {
+    const sessionId = request.params.id;
+    response.render("cancelSession", {
+      sessionId,
+      csrfToken: request.csrfToken(),
+    });
+  }
+);
+
+app.post(
+  "/sports/cancel-session/:id",
+  connectEnsureLogin.ensureLoggedIn(),
+  async (request, response) => {
+    const sessionId = request.params.id;
+    const reason = request.body.reason;
+    try {
+      const cancel = await Sessions.cancelSession(sessionId, reason);
+      response.redirect("/sports");
     } catch (err) {
       return response.status(422).json(err);
     }

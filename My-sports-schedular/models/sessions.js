@@ -18,6 +18,7 @@ module.exports = (sequelize, DataTypes) => {
       return this.findAll({
         where: {
           sportId: sportId,
+          isCanceled: false,
         },
       });
     }
@@ -26,15 +27,25 @@ module.exports = (sequelize, DataTypes) => {
       return this.findAll({
         where: {
           id,
+          isCanceled: false,
         },
       });
     }
 
-    static newSession(date, place, members, players, userId, sportId) {
+    static newSession(
+      date,
+      place,
+      members,
+      sportName,
+      players,
+      userId,
+      sportId
+    ) {
       return this.create({
         dateTime: date,
         place: place,
         members: members,
+        sportName: sportName,
         players: players,
         userId: userId,
         sportId: sportId,
@@ -70,15 +81,61 @@ module.exports = (sequelize, DataTypes) => {
         }
       );
     }
+
+    static updatePlayers(noPlayers, sessionId) {
+      return this.update(
+        {
+          players: noPlayers,
+        },
+        {
+          where: {
+            id: sessionId,
+          },
+        }
+      );
+    }
+
+    static cancelSession(sessionId, reason) {
+      return this.update(
+        {
+          isCanceled: true,
+          reason: reason,
+        },
+        {
+          where: {
+            id: sessionId,
+          },
+        }
+      );
+    }
+
+    static getCanceledSessionByUId(userId) {
+      return this.findAll({
+        where: {
+          userId,
+          isCanceled: true,
+        },
+      });
+    }
+
+    static getSessionBySesId(ids) {
+      return this.findAll({
+        where: {
+          id: ids,
+        },
+      });
+    }
   }
   Sessions.init(
     {
       dateTime: DataTypes.DATE,
       place: DataTypes.STRING,
       members: DataTypes.ARRAY(DataTypes.STRING),
+      sportName: DataTypes.STRING,
       players: DataTypes.INTEGER,
       userId: DataTypes.INTEGER,
       isCanceled: DataTypes.BOOLEAN,
+      reason: DataTypes.STRING,
     },
     {
       sequelize,

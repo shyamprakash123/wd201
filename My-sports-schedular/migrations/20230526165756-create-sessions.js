@@ -25,6 +25,10 @@ module.exports = {
         type: Sequelize.ARRAY(DataTypes.STRING),
         allowNull: false,
       },
+      sportName: {
+        type: Sequelize.STRING,
+        allowNull: false,
+      },
       players: {
         type: Sequelize.INTEGER,
         allowNull: false,
@@ -37,6 +41,11 @@ module.exports = {
         type: Sequelize.BOOLEAN,
         allowNull: false,
         defaultValue: false,
+      },
+      reason: {
+        type: Sequelize.STRING,
+        allowNull: false,
+        defaultValue: "",
       },
       createdAt: {
         allowNull: false,
