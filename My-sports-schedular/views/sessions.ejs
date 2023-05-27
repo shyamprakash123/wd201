@@ -37,21 +37,25 @@
     <title><%= sportName %></title>
 </head>
 <body>
-    <h1><%= sportName %></h1>
-    <div>
-        <h3>Upcoming Sessions</h3>
-        <% if(isAdmin){ %>
+    <div class="grid grid-cols-6">
+        <div class="col-start-3 col-span-2">
+            <div>
+                <h1 class="text-6xl font-semibold text-slate-600 mt-3"><%= sportName %></h1>
+                <% if(isAdmin){ %>
             <div style="float: right;">
-            <a href="/sports/update-sport/<%= sportName %>/<%= sportId %>">Edit Sport</a>
-            <a href="#" class="ml-2" onclick="deleteSport()">Delete Sport</a>
+            <a class="underline hover:underline-offset-4 underline-offset-2 text-green-500 font-serif font-semibold" href="/sports/update-sport/<%= sportName %>/<%= sportId %>">Edit Sport</a>
+            <a class="underline hover:underline-offset-4 underline-offset-2 text-red-500 font-serif font-semibold ml-3" href="#" class="ml-2" onclick="deleteSport()">Delete Sport</a>
         </div>
         <% } %>
-    </div>
+            </div>
+        <div class="mt-3">
+            <h3 class="text-4xl font-semibold text-stone-500 mt-3">Upcoming Sessions</h3>
+        </div>
     <% if(session.length > 0){ %>
-        <ul class="list-none">
+        <ul class="list-none mt-6">
                 <% for(var i=0; i < session.length; i++) { %>
                 <li>
-                    <div class="flex items-center w-fit my-2 px-2 py-1 rounded hover:bg-purple-50">
+                    <div class="flex items-center w-fit my-2 px-2 py-1 rounded hover:bg-purple-50 border border-violet-400">
                         <a class="text-base" href="/sports/<%= sportName %>/session/<%= session[i].id %>"><%= session[i].dateTime.toLocaleDateString('en-US',{
                         year: 'numeric',
                         month: 'long',
@@ -72,13 +76,13 @@
                 <% } %>
             </ul>
             <% }else{ %>
-                <h2>There are no sessions available to join right now. Create one?</h2>
+                <h2 class="font-semibold font-serif text-red-400 font-semibold font-serif">There are no sessions available to join right now. Create one?</h2>
                 <% } %>
-                <div>
-                    <a href="/sports/<%= sportName %>/new-session">Create a new session</a>
-                    <a href="/sports/<%= sportName %>/previous-session">View previous sessions</a>
+                <div class="mt-10">
+                    <a class="underline hover:underline-offset-4 underline-offset-2 text-sky-500 font-serif" href="/sports/<%= sportName %>/new-session">Create a new session</a>
+                    <a class="underline hover:underline-offset-4 underline-offset-2 text-sky-500 font-serif ml-2" href="/sports/<%= sportName %>/previous-session">View previous sessions</a>
                 </div>
-        
-
+    </div>
+    </div>
 </body>
 </html>

@@ -6,29 +6,39 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="<%= csrfToken %>">
     <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body{
+            padding: 15px;
+
+        }
+        hr.rounded {
+        border-top: 8px solid #d7d7d7;
+        border-radius: 5px;
+        }
+    </style>
     <title>My-Sports-Schedular</title>
 </head>
 <body>
-    <h1>My-sports-Schedular</h1>
-    <h2>
-        <%= "Welcome"+" "+user[0].firstName+" "+user[0].lastName %>
-    </h2>
+    <h1 class="text-5xl font-serif">My-sports-Schedular</h1>
     <div>
-        <a style="color: blueviolet;" href="/signout">Signout</a>
+        <h2 class="text-3xl font-serif mt-5">
+        <%= "Welcome"+" "+user[0].firstName+" "+user[0].lastName %><span><a class="ml-5 text-xl" style="color: blueviolet;" href="/signout">Signout</a></span>
+    </h2>
     </div>
     <% if(user[0].role=="admin"){ %>
             <div>
-                <h3>Administrative Actions</h3>
-            <a href="/sports/new-sport">Create a new sport</a> <br>
-            <a href="/reports">View reports</a>
+                <h3 class="text-xl mt-3 font-semibold text-orange-500">Administrative Actions</h3>
+            <a class="underline hover:underline-offset-4 underline-offset-2 text-sky-500 font-serif" href="/sports/new-sport">Create a new sport</a> <br>
+            <a class="underline hover:underline-offset-4 underline-offset-2 text-sky-500 font-serif" href="/reports">View reports</a>
             </div>
             <% } %>
+    <hr class="rounded mt-4">
      <% if(session.length > 0){ %>
-        <h2>You have following upcoming sessions:</h2>
+        <h2 class="font-semibold font-serif text-green-400 mt-4 text-base">You have following upcoming sessions:</h2>
         <ul class="list-none">
                 <% for(var i=0; i < session.length; i++) { %>
                 <li>
-                    <div class="flex items-center w-fit my-2 px-2 py-1 rounded hover:bg-purple-50">
+                    <div class="flex items-center w-fit my-2 px-2 py-1 rounded hover:bg-purple-50 border border-violet-400">
                        <% if(session[i].isCanceled==true){ %>
                             <a class="text-base" href="/sports/<%= session[i].sportName %>/canceled-session/<%= session[i].id %>"><%= session[i].sportName %>-<%= session[i].dateTime.toLocaleDateString('en-US',{
                         year: 'numeric',
@@ -63,32 +73,34 @@
                 <% } %>
             </ul>
             <% }else{ %>
-                <h2>There are no upcoming sessions available. Join to see here</h2>
+                <h2 class="font-semibold font-serif text-red-400 font-semibold font-serif">There are no upcoming sessions available. Join to see here</h2>
                 <% } %> 
+                <hr class="rounded mt-4">
                 <!-- sports -->
             <div style="margin: 50px;">
                 <% if(sports.length > 0) { %>
-                    <h2>The following sports are available. Please select one:</h2>
+                    <h2 class="text-fuchsia-500 font-semibold font-serif mt-2f">The following sports are available. Please select one:</h2>
                     <ul class="list-none">
                 <% for(var i=0; i < sports.length;i++){ %>
                 <li>
-                    <div class="flex items-center w-fit my-2 px-2 py-1 rounded hover:bg-purple-50">
-                        <a class="text-base" href="/sports/<%=sports[i].sports_name%>"><%=sports[i].sports_name %></a>
+                    <div class="flex items-center w-fit my-2 px-2 py-1 rounded hover:bg-purple-50 border border-indigo-300">
+                        <a class="text-base text-teal-500 font-semibold font-serif" href="/sports/<%=sports[i].sports_name%>"><%=sports[i].sports_name %></a>
                     </div>
                 </li>
                 <% } %>
             </ul>
             <% } else { %>
-                <h2>There are no sports available for scheduling a session</h2>
+                <h2 class="font-semibold font-serif text-red-400 font-semibold font-serif">There are no sports available for scheduling a session</h2>
                 <% } %>
             </div>
+            <hr class="rounded mt-4">
                 <!-- sessions created by current user -->
                 <% if(sessionByUser.length > 0){ %>
-        <h2>The sessions you have created</h2>
+        <h2 class="font-semibold font-serif text-green-400 mt-4 text-base">The sessions you have created</h2>
         <ul class="list-none">
                 <% for(var i=0; i < sessionByUser.length; i++) { %>
                 <li>
-                    <div class="flex items-center w-fit my-2 px-2 py-1 rounded hover:bg-purple-50">
+                    <div class="flex items-center w-fit my-2 px-2 py-1 rounded hover:bg-purple-50 border border-violet-400">
                         <% if(sessionByUser[i].dateTime < new Date()){ %>
                             <a class="text-base" href="/sports/<%= sessionByUser[i].sportName %>/previous-session/<%= sessionByUser[i].id %>"><%= sessionByUser[i].sportName %>-<%= sessionByUser[i].dateTime.toLocaleDateString('en-US',{
                         year: 'numeric',
@@ -133,7 +145,7 @@
                 <% } %>
             </ul>
             <% }else{ %>
-                <h2>There are no sessions Created by you.</h2>
+                <h2 class="font-semibold font-serif text-red-400 font-semibold font-serif">There are no sessions Created by you.</h2>
                 <% } %> 
 </body>
 </html>
