@@ -28,7 +28,7 @@
         .getAttribute("content");
 
         function addPlayer() {
-            fetch(`/sports/addPlayer/<%= sport[0].sports_name %>/<%= session[0].id %>`, {
+            fetch(`/sports/addPlayer/<%= session[0].sportName %>/<%= session[0].id %>`, {
       method: "post", // or 'PUT'
       headers: {
         "Content-Type": "application/json",
@@ -49,7 +49,7 @@
 
 
         function removePlayer(){
-        fetch(`/sports/addPlayer/<%= sport[0].sports_name %>/<%= session[0].id %>`, {
+        fetch(`/sports/addPlayer/<%= session[0].sportName %>/<%= session[0].id %>`, {
       method: "delete", // or 'PUT'
       headers: {
         "Content-Type": "application/json",
@@ -69,7 +69,7 @@
         }
 
         function deletePlayer(userId){
-        fetch(`/sports/deletePlayer/<%= sport[0].sports_name %>/<%= session[0].id %>`, {
+        fetch(`/sports/deletePlayer/<%= session[0].sportName %>/<%= session[0].id %>`, {
       method: "delete", // or 'PUT'
       headers: {
         "Content-Type": "application/json",
@@ -90,7 +90,7 @@
         }
 
     function deleteMember(id){
-        fetch(`/sports/deleteMember/<%= sport[0].sports_name %>/<%= session[0].id %>`, {
+        fetch(`/sports/deleteMember/<%= session[0].sportName %>/<%= session[0].id %>`, {
       method: "delete", // or 'PUT'
       headers: {
         "Content-Type": "application/json",
@@ -110,10 +110,10 @@
     })
         }
     </script>
-    <title><%= sport[0].sports_name %>-Session</title>
+    <title><%= session[0].sportName %>-Session</title>
 </head>
 <body>
-    <h1><%= sport[0].sports_name %> Session #<%= session[0].id %></h1>
+    <h1><%= session[0].sportName %> Session #<%= session[0].id %></h1>
     <h3>This session is scheduled for <%= session[0].dateTime.toLocaleString('en-US', {
   day: '2-digit',
   month: '2-digit',
@@ -175,13 +175,13 @@
             <% } %>
                 <% if(session[0].userId==userId){ %>
                     <div>
-                    <a href="/sports/editsession/<%= sport[0].sports_name %>/<%= session[0].id %>">Edit session</a>
+                    <a href="/sports/editsession/<%= session[0].sportName %>/<%= session[0].id %>">Edit session</a>
                     <a href="/sports/cancel-session/<%= session[0].id %>">Cancel session</a>
                 </div>
                 <% }else{ %>
                     <div>
                         <% if(isJoined == true){ %>
-                           <button type="submit" onclick="removePlayer()" class="text-white bg-green-600 hover:bg-green-800 font-medium rounded px-5 py-2">Leave this session</button>
+                           <button type="submit" onclick="removePlayer()" class="text-white bg-red-600 hover:bg-red-800 font-medium rounded px-5 py-2">Leave this session</button>
             <% }else{ %>
                 <% if(session[0].players==0){ %>
                 <button type="submit" class="text-white bg-green-300 font-medium rounded px-5 py-2">This session is full now</button>

@@ -12,22 +12,128 @@
     <h1>My-sports-Schedular</h1>
     <h2>
         <%= "Welcome"+" "+user[0].firstName+" "+user[0].lastName %>
-    
     </h2>
-        <% if(user[0].role=="admin"){ %>
+    <div>
+        <a style="color: blueviolet;" href="/signout">Signout</a>
+    </div>
+    <% if(user[0].role=="admin"){ %>
             <div>
                 <h3>Administrative Actions</h3>
             <a href="/sports/new-sport">Create a new sport</a> <br>
             <a href="/reports">View reports</a>
             </div>
             <% } %>
+     <% if(session.length > 0){ %>
+        <h2>You have following upcoming sessions:</h2>
+        <ul class="list-none">
+                <% for(var i=0; i < session.length; i++) { %>
+                <li>
+                    <div class="flex items-center w-fit my-2 px-2 py-1 rounded hover:bg-purple-50">
+                       <% if(session[i].isCanceled==true){ %>
+                            <a class="text-base" href="/sports/<%= session[i].sportName %>/canceled-session/<%= session[i].id %>"><%= session[i].sportName %>-<%= session[i].dateTime.toLocaleDateString('en-US',{
+                        year: 'numeric',
+                        month: 'long',
+                        day: 'numeric',
+                        hour: 'numeric',
+                        minute: 'numeric',
+                        hour12: true
+                        }) %></a>
+                        <% }else{ %>
+                            <a class="text-base" href="/sports/<%= session[i].sportName %>/session/<%= session[i].id %>"><%= session[i].sportName %>-<%= session[i].dateTime.toLocaleDateString('en-US',{
+                        year: 'numeric',
+                        month: 'long',
+                        day: 'numeric',
+                        hour: 'numeric',
+                        minute: 'numeric',
+                        hour12: true
+                        }) %></a>
+                        <% } %>
+                         <% if(session[i].players==1){ %>
+                            <p class="text-base text-red-700 ml-5"> Last Slot</p>
+                        <% }else if(session[i].players==0){ %>
+                            <p class="text-base text-red-700 ml-5"> Fully Booked</p>
+                            <% }else{ %>
+                                <p class="text-base ml-5"><%= session[i].players+" slots" %></p>
+                            <% } %>
+                            <% if(session[i].isCanceled==true){ %>
+                                <p class="text-base text-red-700 ml-5">CANCELED</p>
+                            <% } %>
+                    </div>
+                </li>
+                <% } %>
+            </ul>
+            <% }else{ %>
+                <h2>There are no upcoming sessions available. Join to see here</h2>
+                <% } %> 
+                <!-- sports -->
             <div style="margin: 50px;">
                 <% if(sports.length > 0) { %>
-            <% for(var i=0; i < sports.length;i++){ %>
-                <a href="/sports/<%=sports[i].sports_name%>"><%=sports[i].sports_name %></a>
-            <% } } else { %>
+                    <h2>The following sports are available. Please select one:</h2>
+                    <ul class="list-none">
+                <% for(var i=0; i < sports.length;i++){ %>
+                <li>
+                    <div class="flex items-center w-fit my-2 px-2 py-1 rounded hover:bg-purple-50">
+                        <a class="text-base" href="/sports/<%=sports[i].sports_name%>"><%=sports[i].sports_name %></a>
+                    </div>
+                </li>
+                <% } %>
+            </ul>
+            <% } else { %>
                 <h2>There are no sports available for scheduling a session</h2>
                 <% } %>
             </div>
+                <!-- sessions created by current user -->
+                <% if(sessionByUser.length > 0){ %>
+        <h2>The sessions you have created</h2>
+        <ul class="list-none">
+                <% for(var i=0; i < sessionByUser.length; i++) { %>
+                <li>
+                    <div class="flex items-center w-fit my-2 px-2 py-1 rounded hover:bg-purple-50">
+                        <% if(sessionByUser[i].dateTime < new Date()){ %>
+                            <a class="text-base" href="/sports/<%= sessionByUser[i].sportName %>/previous-session/<%= sessionByUser[i].id %>"><%= sessionByUser[i].sportName %>-<%= sessionByUser[i].dateTime.toLocaleDateString('en-US',{
+                        year: 'numeric',
+                        month: 'long',
+                        day: 'numeric',
+                        hour: 'numeric',
+                        minute: 'numeric',
+                        hour12: true
+                        }) %></a>
+                        <% }else if(sessionByUser[i].isCanceled==true){ %>
+                            <a class="text-base" href="/sports/<%= sessionByUser[i].sportName %>/canceled-session/<%= sessionByUser[i].id %>"><%= sessionByUser[i].sportName %>-<%= sessionByUser[i].dateTime.toLocaleDateString('en-US',{
+                        year: 'numeric',
+                        month: 'long',
+                        day: 'numeric',
+                        hour: 'numeric',
+                        minute: 'numeric',
+                        hour12: true
+                        }) %></a>
+                        <% }else{ %>
+                            <a class="text-base" href="/sports/<%= sessionByUser[i].sportName %>/session/<%= sessionByUser[i].id %>"><%= sessionByUser[i].sportName %>-<%= sessionByUser[i].dateTime.toLocaleDateString('en-US',{
+                        year: 'numeric',
+                        month: 'long',
+                        day: 'numeric',
+                        hour: 'numeric',
+                        minute: 'numeric',
+                        hour12: true
+                        }) %></a>
+                        <% } %>
+                        <% if(sessionByUser[i].dateTime < new Date()){ %>
+                                <p class="text-base text-red-700 ml-5">Expired</p>
+                        <% }else if(sessionByUser[i].isCanceled==true){ %>
+                                <p class="text-base text-red-700 ml-5">CANCELED</p>
+                         <% }else if(sessionByUser[i].players==1){ %>
+                            <p class="text-base text-red-700 ml-5"> Last Slot</p>
+                        <% }else if(sessionByUser[i].players==0){ %>
+                            <p class="text-base text-red-700 ml-5"> Fully Booked</p>
+                            <% }else{ %>
+                                <p class="text-base ml-5"><%= sessionByUser[i].players+" slots" %></p>
+                            <% } %>
+                    </div>
+                </li>
+                <% } %>
+            </ul>
+            <% }else{ %>
+                <h2>There are no sessions Created by you.</h2>
+                <% } %> 
 </body>
 </html>

@@ -6,13 +6,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="<%= csrfToken %>">
     <script src="https://cdn.tailwindcss.com"></script>
-    <title><%= sport[0].sports_name %></title>
+    <title><%= sportName %></title>
 </head>
 <body>
     <div class="grid grid-cols-6">
         <div class="col-start-3 col-span-2">
-            <h6 class="py-4">New <%= sport[0].sports_name %> Session</h6>
-            <form action="/sports/<%= sport[0].sports_name %>" method="post">
+            <h6 class="py-4">New <%= sportName %> Session</h6>
+            <form action="/sports/<%= sportName %>" method="post">
                 <input type="hidden" name="_csrf" value="<%= csrfToken %>">
                 <input type="hidden" name="sportId" value="<%= sport[0].id %>">
                 <div class="py-3">

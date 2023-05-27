@@ -106,6 +106,15 @@ app.get("/login", async (request, response) => {
   });
 });
 
+app.get("/signout", async (request, response, next) => {
+  request.logOut((err) => {
+    if (err) {
+      return next(err);
+    }
+    response.redirect("/");
+  });
+});
+
 app.post("/users", async (request, response) => {
   const hasedPwd = await bcrypt.hash(request.body.password, saltRounds);
   let flag = true;
@@ -170,7 +179,16 @@ app.get(
     const loggedInUser = request.user.id;
     let user = await User.getUser(loggedInUser);
     let sports = await Sports.getAllSports();
+    let listOfPlayers = [];
+    const players = await Players.getPlayersByUserId(loggedInUser);
+    for (var i = 0; i < players.length; i++) {
+      listOfPlayers.push(players[i].sessionId);
+    }
+    const session = await Sessions.getSessionBySesId(listOfPlayers);
+    const sessionByUser = await Sessions.getSessionByUId(loggedInUser);
     response.render("home", {
+      session,
+      sessionByUser,
       user,
       sports,
       csrfToken: request.csrfToken(),
@@ -207,13 +225,58 @@ app.post(
 );
 
 app.get(
+  "/sports/update-sport/:name/:sportId",
+  connectEnsureLogin.ensureLoggedIn(),
+  async (request, response) => {
+    const sportId = request.params.sportId;
+    const sportName = request.params.name;
+    response.render("editSport", {
+      sportName,
+      sportId,
+      csrfToken: request.csrfToken(),
+    });
+  }
+);
+
+app.post(
+  "/sports/update-sport/:name/:sportId",
+  connectEnsureLogin.ensureLoggedIn(),
+  async (request, response) => {
+    const adminId = request.user.id;
+    const newSportName = request.body.sportName;
+    const oldSportName = request.params.name;
+    const sportId = request.params.sportId;
+    try {
+      const admin = await User.getUser(adminId);
+      if (admin[0].role == "admin") {
+        const sport = await Sports.updateSportName(newSportName, sportId);
+        const updateSessionsSportNames = await Sessions.updateSportsNames(
+          oldSportName,
+          newSportName
+        );
+      }
+      response.redirect(`/sports/${newSportName}`);
+    } catch (err) {
+      return response.status(422).json(err);
+    }
+  }
+);
+
+app.get(
   "/sports/:name",
   connectEnsureLogin.ensureLoggedIn(),
   async (request, response) => {
-    const sport = await Sports.getSportByName(request.params.name);
-    const session = await Sessions.getSessionBySId(sport[0].id);
+    const adminId = request.user.id;
+    const sportName = request.params.name;
+    const sport = await Sports.getSportByName(sportName);
+    const sportId = sport[0].id;
+    const session = await Sessions.getSessionBySId(sportId);
+    const admin = await User.getUser(adminId);
+    const isAdmin = admin[0].role == "admin";
     response.render("sessions", {
-      sport,
+      isAdmin,
+      sportName,
+      sportId,
       session,
       csrfToken: request.csrfToken(),
     });
@@ -224,13 +287,63 @@ app.get(
   "/sports/:name/new-session",
   connectEnsureLogin.ensureLoggedIn(),
   async (request, response) => {
-    const sport = await Sports.getSportByName(request.params.name);
-    const session = await Sessions.getSessionBySId(sport[0].id);
+    const sportName = request.params.name;
+    const sport = await Sports.getSportByName(sportName);
+    const session = await Sessions.getESessionBySId(sport[0].id);
     const date = new Date();
     response.render("new-session", {
+      sportName,
+      sport,
       date,
+      session,
+      csrfToken: request.csrfToken(),
+    });
+  }
+);
+
+app.get(
+  "/sports/:name/previous-session",
+  connectEnsureLogin.ensureLoggedIn(),
+  async (request, response) => {
+    const sport = await Sports.getSportByName(request.params.name);
+    const session = await Sessions.getESessionBySId(sport[0].id);
+    response.render("previous-sessions", {
       sport,
       session,
+      csrfToken: request.csrfToken(),
+    });
+  }
+);
+
+app.get(
+  "/sports/:name/previous-session/:id",
+  connectEnsureLogin.ensureLoggedIn(),
+  async (request, response) => {
+    const sessionId = request.params.id;
+    const session = await Sessions.getSessionById(sessionId);
+    const players = await Players.getPlayersBySId(sessionId);
+    const userId = request.user.id;
+    response.render("previous-session-detail", {
+      session,
+      players,
+      userId,
+      csrfToken: request.csrfToken(),
+    });
+  }
+);
+
+app.get(
+  "/sports/:name/canceled-session/:id",
+  connectEnsureLogin.ensureLoggedIn(),
+  async (request, response) => {
+    const sessionId = request.params.id;
+    const session = await Sessions.getESessionById(sessionId);
+    const players = await Players.getPlayersBySId(sessionId);
+    const userId = request.user.id;
+    response.render("canceled-session-detail", {
+      session,
+      players,
+      userId,
       csrfToken: request.csrfToken(),
     });
   }
@@ -271,14 +384,12 @@ app.get(
   connectEnsureLogin.ensureLoggedIn(),
   async (request, response) => {
     const sessionId = request.params.id;
-    const sport = await Sports.getSportByName(request.params.name);
     const session = await Sessions.getSessionById(sessionId);
     const players = await Players.getPlayersBySId(sessionId);
     const userId = request.user.id;
     const current = await Players.getPlayersByIdS(userId, sessionId);
     let isJoined = current.length == 1;
     response.render("session-detail", {
-      sport,
       session,
       players,
       userId,
@@ -438,6 +549,27 @@ app.post(
     try {
       const cancel = await Sessions.cancelSession(sessionId, reason);
       response.redirect("/sports");
+    } catch (err) {
+      return response.status(422).json(err);
+    }
+  }
+);
+
+app.delete(
+  "/sports/deleteSport/:id",
+  connectEnsureLogin.ensureLoggedIn(),
+  async (request, response) => {
+    const adminId = request.user.id;
+    const sportId = request.params.id;
+    const sport = await Sports.getSportById(sportId);
+    const sportName = sport[0].sports_name;
+    try {
+      const admin = await User.getUser(adminId);
+      if (admin[0].role == "admin") {
+        const deleteSessions = await Sessions.deleteSessionBySName(sportName);
+        const deleteSport = await Sports.deleteSportById(sportId);
+      }
+      return response.json({ success: true });
     } catch (err) {
       return response.status(422).json(err);
     }

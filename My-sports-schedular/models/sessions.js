@@ -1,5 +1,6 @@
 "use strict";
-const { Model } = require("sequelize");
+const { Model, Op } = require("sequelize");
+const today = new Date();
 module.exports = (sequelize, DataTypes) => {
   class Sessions extends Model {
     /**
@@ -19,6 +20,23 @@ module.exports = (sequelize, DataTypes) => {
         where: {
           sportId: sportId,
           isCanceled: false,
+          dateTime: {
+            [Op.not]: {
+              [Op.lt]: today,
+            },
+          },
+        },
+      });
+    }
+
+    static getESessionBySId(sportId) {
+      return this.findAll({
+        where: {
+          sportId: sportId,
+          isCanceled: false,
+          dateTime: {
+            [Op.lt]: today,
+          },
         },
       });
     }
@@ -28,6 +46,15 @@ module.exports = (sequelize, DataTypes) => {
         where: {
           id,
           isCanceled: false,
+        },
+      });
+    }
+
+    static getESessionById(id) {
+      return this.findAll({
+        where: {
+          id,
+          isCanceled: true,
         },
       });
     }
@@ -109,11 +136,10 @@ module.exports = (sequelize, DataTypes) => {
       );
     }
 
-    static getCanceledSessionByUId(userId) {
+    static getSessionByUId(userId) {
       return this.findAll({
         where: {
           userId,
-          isCanceled: true,
         },
       });
     }
@@ -122,10 +148,37 @@ module.exports = (sequelize, DataTypes) => {
       return this.findAll({
         where: {
           id: ids,
+          dateTime: {
+            [Op.not]: {
+              [Op.lt]: today,
+            },
+          },
+        },
+      });
+    }
+
+    static updateSportsNames(oldSportName, newSportName) {
+      return this.update(
+        {
+          sportName: newSportName,
+        },
+        {
+          where: {
+            sportName: oldSportName,
+          },
+        }
+      );
+    }
+
+    static deleteSessionBySName(sportName) {
+      return this.destroy({
+        where: {
+          sportName,
         },
       });
     }
   }
+
   Sessions.init(
     {
       dateTime: DataTypes.DATE,

@@ -32,6 +32,35 @@ module.exports = (sequelize, DataTypes) => {
         adminId: adminId,
       });
     }
+
+    static updateSportName(sportName, sportId) {
+      return this.update(
+        {
+          sports_name: sportName,
+        },
+        {
+          where: {
+            id: sportId,
+          },
+        }
+      );
+    }
+
+    static getSportById(id) {
+      return this.findAll({
+        where: {
+          id,
+        },
+      });
+    }
+
+    static deleteSportById(id) {
+      return this.destroy({
+        where: {
+          id,
+        },
+      });
+    }
   }
   Sports.init(
     {

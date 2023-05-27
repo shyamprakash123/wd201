@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <title><%= sport[0].sports_name %></title>
+</head>
+<body>
+    <h1><%= sport[0].sports_name %></h1>
+    <h3>Previous Sessions</h3>
+    <% if(session.length > 0){ %>
+        <ul class="list-none">
+                <% for(var i=0; i < session.length; i++) { %>
+                <li>
+                    <div class="flex items-center w-fit my-2 px-2 py-1 rounded hover:bg-purple-50">
+                        <a class="text-base" href="/sports/<%= sport[0].sports_name %>/previous-session/<%= session[i].id %>"><%= session[i].dateTime.toLocaleDateString('en-US',{
+                        year: 'numeric',
+                        month: 'long',
+                        day: 'numeric',
+                        hour: 'numeric',
+                        minute: 'numeric',
+                        hour12: true
+                        }) %></a>
+                         <% if(session[i].players==1){ %>
+                            <p class="text-base text-red-700 ml-5"> Last Slot</p>
+                        <% }else if(session[i].players==0){ %>
+                            <p class="text-base text-red-700 ml-5"> Fully Booked</p>
+                            <% }else{ %>
+                                <p class="text-base ml-5"><%= session[i].players+" slots" %></p>
+                            <% } %>
+                            <p class="text-base text-red-700 ml-5">Expired</p>
+                    </div>
+                </li>
+                <% } %>
+            </ul>
+            <% }else{ %>
+                <h2>There are no previous sessions available.</h2>
+                <% } %>
+        
+
+</body>
+</html>
