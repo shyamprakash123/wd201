@@ -177,6 +177,71 @@ module.exports = (sequelize, DataTypes) => {
         },
       });
     }
+
+    static getSessionsCountBySName(sportName) {
+      return this.count({
+        where: {
+          sportName,
+        },
+      });
+    }
+
+    static getSessionsCountBySNameD(sportName, startDate, endDate) {
+      return this.count({
+        where: {
+          sportName,
+          [Op.and]: {
+            [Op.gt]: startDate,
+            [Op.lt]: endDate,
+          },
+        },
+      });
+    }
+
+    static getPreviousSessions(sportName) {
+      return this.findAll({
+        where: {
+          sportName,
+          isCanceled: false,
+          dateTime: {
+            [Op.lt]: today,
+          },
+        },
+      });
+    }
+
+    static getTodaysSessions(sportName) {
+      return this.findAll({
+        where: {
+          sportName,
+          isCanceled: false,
+          dateTime: {
+            [Op.eq]: today,
+          },
+        },
+      });
+    }
+
+    static getUpcomingSessions(sportName) {
+      return this.findAll({
+        where: {
+          sportName,
+          isCanceled: false,
+          dateTime: {
+            [Op.gt]: today,
+          },
+        },
+      });
+    }
+
+    static getCanceledSessions(sportName) {
+      return this.findAll({
+        where: {
+          sportName,
+          isCanceled: true,
+        },
+      });
+    }
   }
 
   Sessions.init(

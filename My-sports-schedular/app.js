@@ -576,4 +576,43 @@ app.delete(
   }
 );
 
+app.get(
+  "/sports/reports/insights",
+  connectEnsureLogin.ensureLoggedIn(),
+  async (request, response) => {
+    const sports = await Sports.getAllSports();
+    const rankings = [];
+    for (var i = 0; i < sports.length; i++) {
+      const sportsName = sports[i].sports_name;
+      const count = await Sessions.getSessionsCountBySName(sportsName);
+      rankings.push({ name: sportsName, count: count });
+    }
+    rankings.sort((a, b) => b.count - a.count);
+    response.render("reports", {
+      rankings,
+      csrfToken: request.csrfToken(),
+    });
+  }
+);
+
+app.get(
+  "/sports/reports/:name/insights",
+  connectEnsureLogin.ensureLoggedIn(),
+  async (request, response) => {
+    const sportName = request.params.name;
+    const previousSession = await Sessions.getPreviousSessions(sportName);
+    const todaysSession = await Sessions.getTodaysSessions(sportName);
+    const upcomingSession = await Sessions.getUpcomingSessions(sportName);
+    const canceledSession = await Sessions.getCanceledSessions(sportName);
+    response.render("sport-insights", {
+      sportName,
+      previousSession,
+      todaysSession,
+      upcomingSession,
+      canceledSession,
+      csrfToken: request.csrfToken(),
+    });
+  }
+);
+
 module.exports = app;

@@ -5,6 +5,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="<%= csrfToken %>">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@48,400,0,0" />
     <style>
         body {
   font-family: sans-serif;
@@ -113,8 +114,10 @@
     <title><%= session[0].sportName %>-Session</title>
 </head>
 <body>
-    <h1><%= session[0].sportName %> Session #<%= session[0].id %></h1>
-    <h3>This session is scheduled for <%= session[0].dateTime.toLocaleString('en-US', {
+    <div class="grid grid-cols-6">
+        <div class="col-start-3 col-span-2">
+            <h1 class="text-4xl font-semibold text-slate-600 mt-3"><%= session[0].sportName %> Session #<%= session[0].id %></h1>
+    <h3 class="text-2xl font-semibold text-stone-500 mt-3">This session is scheduled for <%= session[0].dateTime.toLocaleString('en-US', {
   day: '2-digit',
   month: '2-digit',
   year: 'numeric',
@@ -122,12 +125,13 @@
   minute: '2-digit',
   hour12: true
 }) %>, to be played at "<%= session[0].place %>"</h3>
-    <h3>Players</h3>
+    <h3 class="text-2xl font-semibold text-slate-400 mt-3">Players</h3>
+
     <% if(session[0].members.length > 0){ %>
         <ul class="list-none">
                 <% for(var i=0; i < session[0].members.length; i++) { %>
                 <li class="users">
-                    <div class="flex items-center w-fit my-2 px-2 py-1 rounded hover:bg-purple-50">
+                    <div class="flex items-center w-fit my-2 px-2 py-1 rounded hover:bg-purple-50 border border-violet-400">
                         <h3><%= session[0].members[i] %></h3>
                         <% if(session[0].userId==userId){ %>
                             <a href="#" class="hidden trash-icon ml-2" onclick="deleteMember(<%= i %>)">
@@ -146,9 +150,9 @@
         <ul class="list-none">
                 <% for(var i=0; i < players.length; i++) { %>
                 <li class="users">
-                    <div class="flex items-center w-fit my-2 px-2 py-1 rounded hover:bg-purple-50">
+                    <div class="flex items-center w-fit my-2 px-2 py-1 rounded hover:bg-purple-50 border border-violet-400">
                         <% if(players[i].userId==userId){ %>
-                            <h3>You</h3>
+                            <h3 class="text-slate-500">You</h3>
                         <% }else{ %>
                             <% if(session[0].userId==players[i].userId){ %>
                                 <h3><%= players[i].userName %></h3>
@@ -171,12 +175,12 @@
             <% } %>
 
             <% if(session[0].members.length==0 && players.length==0){ %>
-                <h2>There are no players available in this session. Join?</h2>
+                <h2 class="font-semibold font-serif text-red-400 font-semibold font-serif mt-5">There are no players available in this session. Join?</h2>
             <% } %>
                 <% if(session[0].userId==userId){ %>
                     <div>
-                    <a href="/sports/editsession/<%= session[0].sportName %>/<%= session[0].id %>">Edit session</a>
-                    <a href="/sports/cancel-session/<%= session[0].id %>">Cancel session</a>
+                    <a class="underline hover:underline-offset-4 underline-offset-2 text-green-500 font-serif" href="/sports/editsession/<%= session[0].sportName %>/<%= session[0].id %>"><span class="material-symbols-outlined">edit_square</span>Edit session</a>
+                    <a class="underline hover:underline-offset-4 underline-offset-2 text-red-500 font-serif ml-5" href="/sports/cancel-session/<%= session[0].id %>"><span class="material-symbols-outlined">cancel</span>Cancel session</a>
                 </div>
                 <% }else{ %>
                     <div>
@@ -192,6 +196,11 @@
                     </div>
 
                     <% } %>
+
+        </div>
+    </div>
+    
+    
         
 
 </body>

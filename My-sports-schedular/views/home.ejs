@@ -19,22 +19,22 @@
     <title>My-Sports-Schedular</title>
 </head>
 <body>
-    <h1 class="text-5xl font-serif">My-sports-Schedular</h1>
+    <h1 class="text-5xl font-serif font-semibold text-slate-600">My-sports-Schedular</h1>
     <div>
-        <h2 class="text-3xl font-serif mt-5">
-        <%= "Welcome"+" "+user[0].firstName+" "+user[0].lastName %><span><a class="ml-5 text-xl" style="color: blueviolet;" href="/signout">Signout</a></span>
+        <h2 class="text-3xl font-serif text-stone-600 mt-5">
+        <%= "Welcome"+" "+user[0].firstName+" "+user[0].lastName %><span><a class="ml-5 text-xl underline hover:underline-offset-4 underline-offset-2" style="color: blueviolet;" href="/signout">Signout</a></span>
     </h2>
     </div>
     <% if(user[0].role=="admin"){ %>
             <div>
                 <h3 class="text-xl mt-3 font-semibold text-orange-500">Administrative Actions</h3>
             <a class="underline hover:underline-offset-4 underline-offset-2 text-sky-500 font-serif" href="/sports/new-sport">Create a new sport</a> <br>
-            <a class="underline hover:underline-offset-4 underline-offset-2 text-sky-500 font-serif" href="/reports">View reports</a>
+            <a class="underline hover:underline-offset-4 underline-offset-2 text-sky-500 font-serif" href="/sports/reports/insights">View reports</a>
             </div>
             <% } %>
     <hr class="rounded mt-4">
+    <h2 class="font-semibold font-serif text-green-400 mt-4 text-base">You have following upcoming sessions:</h2>
      <% if(session.length > 0){ %>
-        <h2 class="font-semibold font-serif text-green-400 mt-4 text-base">You have following upcoming sessions:</h2>
         <ul class="list-none">
                 <% for(var i=0; i < session.length; i++) { %>
                 <li>
@@ -78,8 +78,8 @@
                 <hr class="rounded mt-4">
                 <!-- sports -->
             <div style="margin: 50px;">
+                <h2 class="text-fuchsia-500 font-semibold font-serif mt-2f">The following sports are available. Please select one:</h2>
                 <% if(sports.length > 0) { %>
-                    <h2 class="text-fuchsia-500 font-semibold font-serif mt-2f">The following sports are available. Please select one:</h2>
                     <ul class="list-none">
                 <% for(var i=0; i < sports.length;i++){ %>
                 <li>
@@ -95,8 +95,8 @@
             </div>
             <hr class="rounded mt-4">
                 <!-- sessions created by current user -->
+                <h2 class="font-semibold font-serif text-green-400 mt-4 text-base">The sessions you have created</h2>
                 <% if(sessionByUser.length > 0){ %>
-        <h2 class="font-semibold font-serif text-green-400 mt-4 text-base">The sessions you have created</h2>
         <ul class="list-none">
                 <% for(var i=0; i < sessionByUser.length; i++) { %>
                 <li>

@@ -9,9 +9,9 @@
     <title>Cancel Session</title>
 </head>
 <body>
-    <h1>Cancel Session</h1>
     <div class="grid grid-cols-6">
         <div class="col-start-3 col-span-2">
+            <h1 class="py-4 text-3xl font-semibold text-slate-600 mt-3">Cancel Session</h1>
     <form action="/sports/cancel-session/<%= sessionId %>" method="post">
                 <input type="hidden" name="_csrf" value="<%= csrfToken %>">
                 <div class="py-3">
