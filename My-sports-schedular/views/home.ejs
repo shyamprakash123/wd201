@@ -22,7 +22,7 @@
     <h1 class="text-5xl font-serif font-semibold text-slate-600">My-sports-Schedular</h1>
     <div>
         <h2 class="text-3xl font-serif text-stone-600 mt-5">
-        <%= "Welcome"+" "+user[0].firstName+" "+user[0].lastName %><span><a class="ml-5 text-xl underline hover:underline-offset-4 underline-offset-2" style="color: blueviolet;" href="/signout">Signout</a></span>
+        <%= "Welcome"+" "+user[0].firstName+" "+user[0].lastName %><span><a class="ml-5 text-xl underline hover:underline-offset-4 underline-offset-2" style="color: blueviolet;" href="/signout">Signout</a><a class="ml-5 text-xl underline hover:underline-offset-4 underline-offset-2" style="color: rgb(68, 186, 0);" href="/User/changePassword">Change Password</a></span>
     </h2>
     </div>
     <% if(user[0].role=="admin"){ %>

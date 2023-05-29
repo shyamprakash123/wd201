@@ -1,6 +1,10 @@
 "use strict";
 const { Model, Op } = require("sequelize");
 const today = new Date();
+const todayStart = new Date();
+todayStart.setHours(0, 0, 0, 0);
+const todayEnd = new Date();
+todayEnd.setHours(23, 59, 59, 999);
 module.exports = (sequelize, DataTypes) => {
   class Sessions extends Model {
     /**
@@ -21,9 +25,7 @@ module.exports = (sequelize, DataTypes) => {
           sportId: sportId,
           isCanceled: false,
           dateTime: {
-            [Op.not]: {
-              [Op.lt]: today,
-            },
+            [Op.gt]: today,
           },
         },
       });
@@ -178,68 +180,145 @@ module.exports = (sequelize, DataTypes) => {
       });
     }
 
-    static getSessionsCountBySName(sportName) {
-      return this.count({
-        where: {
-          sportName,
-        },
-      });
-    }
-
-    static getSessionsCountBySNameD(sportName, startDate, endDate) {
-      return this.count({
-        where: {
-          sportName,
-          [Op.and]: {
-            [Op.gt]: startDate,
-            [Op.lt]: endDate,
+    static getSessionsCountBySName(sportName, start, end) {
+      if (start !== "null" && end !== "null") {
+        const startDate = new Date(start);
+        const endDate = new Date(end);
+        return this.count({
+          where: {
+            sportName,
+            dateTime: {
+              [Op.and]: {
+                [Op.gt]: startDate,
+                [Op.lt]: endDate,
+              },
+            },
           },
-        },
-      });
-    }
-
-    static getPreviousSessions(sportName) {
-      return this.findAll({
-        where: {
-          sportName,
-          isCanceled: false,
-          dateTime: {
-            [Op.lt]: today,
+        });
+      } else {
+        return this.count({
+          where: {
+            sportName,
           },
-        },
-      });
+        });
+      }
     }
 
-    static getTodaysSessions(sportName) {
-      return this.findAll({
-        where: {
-          sportName,
-          isCanceled: false,
-          dateTime: {
-            [Op.eq]: today,
+    static getPreviousSessions(sportName, start, end) {
+      if (start !== "null" && end !== "null") {
+        const startDate = new Date(start);
+        startDate.setHours(0, 0, 0, 0);
+        return this.findAll({
+          where: {
+            sportName,
+            isCanceled: false,
+            dateTime: {
+              [Op.lt]: startDate,
+            },
           },
-        },
-      });
-    }
-
-    static getUpcomingSessions(sportName) {
-      return this.findAll({
-        where: {
-          sportName,
-          isCanceled: false,
-          dateTime: {
-            [Op.gt]: today,
+        });
+      } else {
+        return this.findAll({
+          where: {
+            sportName,
+            isCanceled: false,
+            dateTime: {
+              [Op.lt]: todayStart,
+            },
           },
-        },
-      });
+        });
+      }
     }
 
-    static getCanceledSessions(sportName) {
+    static getTodaysSessions(sportName, start, end) {
+      if (start !== "null" && end !== "null") {
+        const startDate = new Date(start);
+        const endDate = new Date(end);
+        return this.findAll({
+          where: {
+            sportName,
+            isCanceled: false,
+            dateTime: {
+              [Op.and]: {
+                [Op.gt]: startDate,
+                [Op.lt]: endDate,
+              },
+            },
+          },
+        });
+      } else {
+        return this.findAll({
+          where: {
+            sportName,
+            isCanceled: false,
+            dateTime: {
+              [Op.and]: {
+                [Op.gt]: todayStart,
+                [Op.lt]: todayEnd,
+              },
+            },
+          },
+        });
+      }
+    }
+
+    static getUpcomingSessions(sportName, start, end) {
+      if (start !== "null" && end !== "null") {
+        const endDate = new Date(end);
+        endDate.setHours(23, 59, 59, 999);
+        return this.findAll({
+          where: {
+            sportName,
+            isCanceled: false,
+            dateTime: {
+              [Op.gt]: endDate,
+            },
+          },
+        });
+      } else {
+        return this.findAll({
+          where: {
+            sportName,
+            isCanceled: false,
+            dateTime: {
+              [Op.gt]: todayEnd,
+            },
+          },
+        });
+      }
+    }
+
+    static getCanceledSessions(sportName, start, end) {
+      if (start !== "null" && end !== "null") {
+        const startDate = new Date(start);
+        const endDate = new Date(end);
+        startDate.setHours(0, 0, 0, 0);
+        endDate.setHours(23, 59, 59, 999);
+        return this.findAll({
+          where: {
+            sportName,
+            isCanceled: true,
+            dateTime: {
+              [Op.and]: {
+                [Op.gt]: startDate,
+                [Op.lt]: endDate,
+              },
+            },
+          },
+        });
+      } else {
+        return this.findAll({
+          where: {
+            sportName,
+            isCanceled: true,
+          },
+        });
+      }
+    }
+
+    static getSessionsWithSIdT(sessionId, dateTime) {
       return this.findAll({
-        where: {
-          sportName,
-          isCanceled: true,
-        },
+        where: { id: sessionId, dateTime: dateTime, isCanceled: false },
       });
     }
   }

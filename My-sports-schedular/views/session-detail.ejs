@@ -110,6 +110,10 @@
         console.error(err);
     })
         }
+
+        function loadSession(sportName,sessionId){
+            window.location.href = `/sports/${sportName}/session/${sessionId}`;
+        }
     </script>
     <title><%= session[0].sportName %>-Session</title>
 </head>
@@ -125,7 +129,10 @@
   minute: '2-digit',
   hour12: true
 }) %>, to be played at "<%= session[0].place %>"</h3>
-    <h3 class="text-2xl font-semibold text-slate-400 mt-3">Players</h3>
+    <% if(session[0].userId==userId){ %>
+        <h3 class="text-xl font-semibold text-violet-400 mt-3">Hover on players to delete</h3>
+    <% } %>
+    <h3 class="text-2xl font-semibold text-slate-400 mt-3">Players - <%= session[0].members.length+players.length %></h3>
 
     <% if(session[0].members.length > 0){ %>
         <ul class="list-none">
@@ -189,8 +196,10 @@
             <% }else{ %>
                 <% if(session[0].players==0){ %>
                 <button type="submit" class="text-white bg-green-300 font-medium rounded px-5 py-2">This session is full now</button>
-                <% }else{ %>
+                <% }else if(allowToJoin==null){ %>
                 <button type="submit" onclick="addPlayer()" class="text-white bg-green-600 hover:bg-green-800 font-medium rounded px-5 py-2">Join this session</button>
+                <% }else{ %>
+                    <button type="submit" onclick="loadSession('<%= allowToJoin[0].sportName %>','<%= allowToJoin[0].id %>')" class="text-white bg-gray-600 hover:bg-gray-800 font-medium rounded px-5 py-2">You have another session of same time - click to show</button>
                 <% } %>
             <% } %>
                     </div>

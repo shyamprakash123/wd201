@@ -2,7 +2,6 @@
 /* eslint-disable no-undef */
 const express = require("express");
 var csrf = require("tiny-csrf");
-var format = require("date-format");
 const app = express();
 const flash = require("connect-flash");
 var cookieParser = require("cookie-parser");
@@ -212,14 +211,24 @@ app.post(
   async (request, response) => {
     const adminId = request.user.id;
     const sportName = request.body.sportName;
-    try {
-      const admin = await User.getUser(adminId);
-      if (admin[0].role == "admin") {
-        const sport = await Sports.addNewSport(sportName, adminId);
+    let flag = true;
+    if (sportName.length == 0) {
+      flag = false;
+      request.flash("error", "Sport Name should not be empty!");
+    }
+    if (flag) {
+      try {
+        const admin = await User.getUser(adminId);
+        if (admin[0].role == "admin") {
+          const sport = await Sports.addNewSport(sportName, adminId);
+        }
+        response.redirect(`/sports/${sportName}`);
+      } catch (err) {
+        request.flash("error", "Sport name already exists!");
+        response.redirect("/sports/new-sport");
       }
-      response.redirect(`/sports/${sportName}`);
-    } catch (err) {
-      return response.status(422).json(err);
+    } else {
+      response.redirect("/sports/new-sport");
     }
   }
 );
@@ -244,20 +253,30 @@ app.post(
   async (request, response) => {
     const adminId = request.user.id;
     const newSportName = request.body.sportName;
+    let flag = true;
+    if (newSportName.length == 0) {
+      flag = false;
+      request.flash("error", "Sport Name should not be empty!");
+    }
     const oldSportName = request.params.name;
     const sportId = request.params.sportId;
-    try {
-      const admin = await User.getUser(adminId);
-      if (admin[0].role == "admin") {
-        const sport = await Sports.updateSportName(newSportName, sportId);
-        const updateSessionsSportNames = await Sessions.updateSportsNames(
-          oldSportName,
-          newSportName
-        );
+    if (flag) {
+      try {
+        const admin = await User.getUser(adminId);
+        if (admin[0].role == "admin") {
+          const sport = await Sports.updateSportName(newSportName, sportId);
+          const updateSessionsSportNames = await Sessions.updateSportsNames(
+            oldSportName,
+            newSportName
+          );
+        }
+        response.redirect(`/sports/${newSportName}`);
+      } catch (err) {
+        request.flash("error", err.messages);
+        response.redirect(`/sports/update-sport/${oldSportName}/${sportId}`);
       }
-      response.redirect(`/sports/${newSportName}`);
-    } catch (err) {
-      return response.status(422).json(err);
+    } else {
+      response.redirect(`/sports/update-sport/${oldSportName}/${sportId}`);
     }
   }
 );
@@ -290,7 +309,7 @@ app.get(
     const sportName = request.params.name;
     const sport = await Sports.getSportByName(sportName);
     const session = await Sessions.getESessionBySId(sport[0].id);
-    const date = new Date();
+    const date = new Date().toISOString().slice(0, 16);
     response.render("new-session", {
       sportName,
       sport,
@@ -354,27 +373,50 @@ app.post(
   connectEnsureLogin.ensureLoggedIn(),
   async (request, response) => {
     const sportName = request.params.name;
+    let flag = true;
     const userId = request.user.id;
     const date = request.body.dateTime;
     const place = request.body.place;
-    const members = request.body.members.split(",");
+    let members = request.body.members;
     const players = request.body.players;
     const sportId = request.body.sportId;
-    const userName = request.user.firstName + " " + request.user.lastName;
-    try {
-      const session = await Sessions.newSession(
-        date,
-        place,
-        members,
-        sportName,
-        Number(players),
-        userId,
-        sportId
-      );
-      const player = await Players.addPlayers(userId, session.id, userName);
-      response.redirect(`/sports/${sportName}/session/${session.id}`);
-    } catch (err) {
-      return response.status(422).json(err);
+    if (date.length == 0) {
+      flag = false;
+      request.flash("error", "Date and Time should not be empty!");
+    }
+    if (place.length == 0) {
+      flag = false;
+      request.flash("error", "Address should not be empty!");
+    }
+    if (members.length == 0) {
+      flag = false;
+      request.flash("error", "Team members should not be empty!");
+    } else {
+      members = members.split(",");
+    }
+    if (players.length == 0) {
+      flag = false;
+      request.flash("error", "Number of players should not be empty!");
+    }
+    if (flag) {
+      const userName = request.user.firstName + " " + request.user.lastName;
+      try {
+        const session = await Sessions.newSession(
+          date,
+          place,
+          members,
+          sportName,
+          Number(players),
+          userId,
+          sportId
+        );
+        const player = await Players.addPlayers(userId, session.id, userName);
+        response.redirect(`/sports/${sportName}/session/${session.id}`);
+      } catch (err) {
+        return response.status(422).json(err);
+      }
+    } else {
+      response.redirect(`/sports/${sportName}/new-session`);
     }
   }
 );
@@ -388,9 +430,24 @@ app.get(
     const players = await Players.getPlayersBySId(sessionId);
     const userId = request.user.id;
     const current = await Players.getPlayersByIdS(userId, sessionId);
+    const noOfSessionsJoined = await Players.getPlayersByUserId(userId);
+    let sessions = null;
+    for (var i = 0; i < noOfSessionsJoined.length; i++) {
+      sessions = await Sessions.getSessionsWithSIdT(
+        noOfSessionsJoined[i].sessionId,
+        session[0].dateTime
+      );
+      if (sessions.length > 0) {
+        break;
+      } else {
+        sessions = null;
+      }
+    }
+    const allowToJoin = sessions;
     let isJoined = current.length == 1;
     response.render("session-detail", {
       session,
+      allowToJoin,
       players,
       userId,
       isJoined,
@@ -488,7 +545,7 @@ app.get(
     const sportName = request.params.name;
     const session = await Sessions.getSessionById(request.params.id);
     const userId = request.user.id;
-    const date = new Date();
+    const date = new Date().toISOString().slice(0, 16);
     if (session[0].userId == userId) {
       response.render("editSession", {
         date,
@@ -507,23 +564,46 @@ app.post(
   "/sports/editsession/:name/:id",
   connectEnsureLogin.ensureLoggedIn(),
   async (request, response) => {
+    let flag = true;
     const sportName = request.params.name;
     const date = request.body.dateTime;
     const place = request.body.place;
-    const members = request.body.members.split(",");
+    let members = request.body.members;
     const players = request.body.players;
     const sessionId = request.params.id;
-    try {
-      const session = await Sessions.sessionUpdate(
-        date,
-        place,
-        members,
-        Number(players),
-        sessionId
-      );
-      response.redirect(`/sports/${sportName}/session/${sessionId}`);
-    } catch (err) {
-      return response.status(422).json(err);
+    if (date.length == 0) {
+      flag = false;
+      request.flash("error", "Date and Time should not be empty!");
+    }
+    if (place.length == 0) {
+      flag = false;
+      request.flash("error", "Address should not be empty!");
+    }
+    if (members.length == 0) {
+      flag = false;
+      request.flash("error", "Team members should not be empty!");
+    } else {
+      members = members.split(",");
+    }
+    if (players.length == 0) {
+      flag = false;
+      request.flash("error", "Number of players should not be empty!");
+    }
+    if (flag) {
+      try {
+        const session = await Sessions.sessionUpdate(
+          date,
+          place,
+          members,
+          Number(players),
+          sessionId
+        );
+        response.redirect(`/sports/${sportName}/session/${sessionId}`);
+      } catch (err) {
+        return response.status(422).json(err);
+      }
+    } else {
+      response.redirect(`/sports/${sportName}/new-session`);
     }
   }
 );
@@ -546,11 +626,20 @@ app.post(
   async (request, response) => {
     const sessionId = request.params.id;
     const reason = request.body.reason;
-    try {
-      const cancel = await Sessions.cancelSession(sessionId, reason);
-      response.redirect("/sports");
-    } catch (err) {
-      return response.status(422).json(err);
+    let flag = true;
+    if (reason.length == 0) {
+      flag = false;
+      request.flash("error", "Reason should not be empty");
+    }
+    if (flag) {
+      try {
+        const cancel = await Sessions.cancelSession(sessionId, reason);
+        response.redirect("/sports");
+      } catch (err) {
+        return response.status(422).json(err);
+      }
+    } else {
+      response.redirect(`/sports/cancel-session/${sessionId}`);
     }
   }
 );
@@ -577,34 +666,77 @@ app.delete(
 );
 
 app.get(
-  "/sports/reports/insights",
+  "/sports/reports/insights/:startDate?/:endDate?",
   connectEnsureLogin.ensureLoggedIn(),
   async (request, response) => {
-    const sports = await Sports.getAllSports();
-    const rankings = [];
-    for (var i = 0; i < sports.length; i++) {
-      const sportsName = sports[i].sports_name;
-      const count = await Sessions.getSessionsCountBySName(sportsName);
-      rankings.push({ name: sportsName, count: count });
+    let start = request.query.startDate;
+    let end = request.query.endDate;
+    start = start || "null";
+    end = end || "null";
+    let flag = true;
+    if (start !== "null" && end !== "null") {
+      if (start > end) {
+        flag = false;
+        request.flash("error", "Start Date should be less than End Date");
+      }
     }
-    rankings.sort((a, b) => b.count - a.count);
-    response.render("reports", {
-      rankings,
-      csrfToken: request.csrfToken(),
-    });
+    if (flag) {
+      const sports = await Sports.getAllSports();
+      const rankings = [];
+      for (var i = 0; i < sports.length; i++) {
+        const sportsName = sports[i].sports_name;
+        const count = await Sessions.getSessionsCountBySName(
+          sportsName,
+          start,
+          end
+        );
+        rankings.push({ name: sportsName, count: count });
+      }
+      rankings.sort((a, b) => b.count - a.count);
+      response.render("reports", {
+        rankings,
+        csrfToken: request.csrfToken(),
+      });
+    } else {
+      response.redirect("/sports/reports/insights/");
+    }
   }
 );
 
 app.get(
-  "/sports/reports/:name/insights",
+  "/sports/reports/:name/insights/:startDate?/:endDate?",
   connectEnsureLogin.ensureLoggedIn(),
   async (request, response) => {
+    let start = request.query.startDate;
+    let end = request.query.endDate;
+    start = start || "null";
+    end = end || "null";
     const sportName = request.params.name;
-    const previousSession = await Sessions.getPreviousSessions(sportName);
-    const todaysSession = await Sessions.getTodaysSessions(sportName);
-    const upcomingSession = await Sessions.getUpcomingSessions(sportName);
-    const canceledSession = await Sessions.getCanceledSessions(sportName);
+    const previousSession = await Sessions.getPreviousSessions(
+      sportName,
+      start,
+      end
+    );
+    const todaysSession = await Sessions.getTodaysSessions(
+      sportName,
+      start,
+      end
+    );
+    const upcomingSession = await Sessions.getUpcomingSessions(
+      sportName,
+      start,
+      end
+    );
+    const canceledSession = await Sessions.getCanceledSessions(
+      sportName,
+      start,
+      end
+    );
+    let startDate = new Date(start);
+    let endDate = new Date(end);
     response.render("sport-insights", {
+      startDate,
+      endDate,
       sportName,
       previousSession,
       todaysSession,
@@ -612,6 +744,68 @@ app.get(
       canceledSession,
       csrfToken: request.csrfToken(),
     });
+  }
+);
+
+app.get(
+  "/User/changePassword",
+  connectEnsureLogin.ensureLoggedIn(),
+  async (request, response) => {
+    response.render("passwordChange", {
+      csrfToken: request.csrfToken(),
+    });
+  }
+);
+
+app.post(
+  "/User/changePassword/newPassword",
+  connectEnsureLogin.ensureLoggedIn(),
+  async (request, response) => {
+    const oldPassword = request.body.oldpassword;
+    const newPassword = request.body.newpassword;
+    let flag = true;
+    if (oldPassword.length == 0) {
+      flag = false;
+      request.flash("error", "Old Password should not be empty!");
+    }
+    if (newPassword.length == 0) {
+      flag = false;
+      request.flash("error", "New Password should not be empty!");
+    }
+    const userId = request.user.id;
+    if (flag) {
+      try {
+        let flag1 = true;
+        await User.findOne({ where: { id: userId } })
+          .then(async (user) => {
+            const result = await bcrypt.compare(oldPassword, user.password);
+            if (result) {
+              const hasedNewPwd = await bcrypt.hash(newPassword, saltRounds);
+              const updatePassword = await User.updatePassword(
+                userId,
+                hasedNewPwd
+              );
+            } else {
+              flag1 = false;
+              request.flash("error", "Password is not matched!");
+            }
+          })
+          .catch((error) => {
+            flag1 = false;
+            request.flash("error", "Invalid credentials");
+          });
+        if (flag1) {
+          response.redirect("/sports");
+        } else {
+          response.redirect("/User/changePassword");
+        }
+      } catch (err) {
+        request.flash("error", "Password is not matched!");
+        response.redirect("/User/changePassword");
+      }
+    } else {
+      response.redirect("/User/changePassword");
+    }
   }
 );
 

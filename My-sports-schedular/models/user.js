@@ -19,6 +19,19 @@ module.exports = (sequelize, DataTypes) => {
         },
       });
     }
+
+    static updatePassword(id, newPassword) {
+      return this.update(
+        {
+          password: newPassword,
+        },
+        {
+          where: {
+            id,
+          },
+        }
+      );
+    }
   }
   User.init(
     {

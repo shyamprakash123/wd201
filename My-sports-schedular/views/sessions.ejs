@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="<%= csrfToken %>">
     <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@48,400,1,0" />
     <script>
         var token= document
         .querySelector('meta[name="csrf-token"]')
@@ -43,8 +44,8 @@
                 <h1 class="text-6xl font-semibold text-slate-600 mt-3"><%= sportName %></h1>
                 <% if(isAdmin){ %>
             <div style="float: right;">
-            <a class="underline hover:underline-offset-4 underline-offset-2 text-green-500 font-serif font-semibold" href="/sports/update-sport/<%= sportName %>/<%= sportId %>">Edit Sport</a>
-            <a class="underline hover:underline-offset-4 underline-offset-2 text-red-500 font-serif font-semibold ml-3" href="#" class="ml-2" onclick="deleteSport()">Delete Sport</a>
+            <a class="underline hover:underline-offset-4 underline-offset-2 text-green-500 font-serif font-semibold" href="/sports/update-sport/<%= sportName %>/<%= sportId %>"><span class="material-symbols-outlined">edit_square</span> Edit Sport</a>
+            <a class="underline hover:underline-offset-4 underline-offset-2 text-red-500 font-serif font-semibold ml-3" href="#" class="ml-2" onclick="deleteSport()"><span class="material-symbols-outlined">delete</span> Delete Sport</a>
         </div>
         <% } %>
             </div>

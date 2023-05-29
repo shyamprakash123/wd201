@@ -3,3 +3,6 @@
 
 cd My-sports-schedular && npm test
 npx lint-staged
+cd My-sports-schedular && npm test
+npx lint-staged
+npx lint-staged

@@ -36,7 +36,7 @@
   minute: '2-digit',
   hour12: true
 }) %>, to be played at "<%= session[0].place %>"</h3>
-    <h3 class="text-2xl font-semibold text-slate-400 mt-3">Players</h3>
+    <h3 class="text-2xl font-semibold text-slate-400 mt-3">Players - <%= session[0].members.length+players.length %></h3>
     <% if(session[0].members.length > 0){ %>
         <ul class="list-none">
                 <% for(var i=0; i < session[0].members.length; i++) { %>
