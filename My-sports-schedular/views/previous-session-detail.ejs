@@ -27,6 +27,7 @@
 <body>
     <div class="grid grid-cols-6">
         <div class="col-start-3 col-span-2">
+            <a href="/sports" class="underline hover:underline-offset-4 underline-offset-2 text-lg font-semibold text-teal-600 mt-2">Home</a>
             <h1 class="text-4xl font-semibold text-slate-600 mt-3"><%= session[0].sportName %> Previous Session #<%= session[0].id %></h1>
     <h3 class="text-2xl font-semibold text-stone-500 mt-3">This previous session is scheduled for <%= session[0].dateTime.toLocaleString('en-US', {
   day: '2-digit',
@@ -37,11 +38,12 @@
   hour12: true
 }) %>, to be played at "<%= session[0].place %>"</h3>
     <h3 class="text-2xl font-semibold text-slate-400 mt-3">Players - <%= session[0].members.length+players.length %></h3>
-    <% if(session[0].members.length > 0){ %>
+    <div class="w-fit">
+        <% if(session[0].members.length > 0){ %>
         <ul class="list-none">
                 <% for(var i=0; i < session[0].members.length; i++) { %>
                 <li class="users">
-                    <div class="flex items-center w-fit my-2 px-2 py-1 rounded hover:bg-purple-50 border border-violet-400">
+                    <div class="flex items-center w-full my-2 px-2 py-1 rounded hover:bg-purple-50 border border-violet-400">
                         <h3><%= session[0].members[i] %></h3>
                     </div>
                 </li>
@@ -53,7 +55,7 @@
         <ul class="list-none">
                 <% for(var i=0; i < players.length; i++) { %>
                 <li class="users">
-                    <div class="flex items-center w-fit my-2 px-2 py-1 rounded hover:bg-purple-50 border border-violet-400">
+                    <div class="flex items-center w-full place-content-evenly my-2 px-2 py-1 rounded hover:bg-purple-50 border border-violet-400">
                         <% if(players[i].userId==userId){ %>
                             <h3 class="text-slate-500">You</h3>
                         <% }else{ %>
@@ -69,8 +71,8 @@
                 <% } %>
             </ul>
             <% } %>
-
-            <% if(session[0].members.length==0 && players.length==0){ %>
+    </div>
+    <% if(session[0].members.length==0 && players.length==0){ %>
                 <h2 class="font-semibold font-serif text-red-400 font-semibold font-serif mt-5">There are no players joined this session.</h2>
             <% } %>
         </div>

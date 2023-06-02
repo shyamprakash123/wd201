@@ -11,6 +11,7 @@
 <body>
     <div class="grid grid-cols-6">
         <div class="col-start-3 col-span-2">
+            <a href="/sports" class="underline hover:underline-offset-4 underline-offset-2 text-lg font-semibold text-teal-600 mt-2">Home</a>
             <h6 class="py-4 py-4 text-3xl font-semibold text-slate-600 mt-3">Edit <%= sportName %> Session</h6>
             <form action="/sports/editsession/<%= sportName %>/<%= session[0].id %>" method="post">
                 <input type="hidden" name="_csrf" value="<%= csrfToken %>">

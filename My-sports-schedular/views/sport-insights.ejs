@@ -17,6 +17,7 @@
 <body>
      <div class="grid grid-cols-6">
         <div class="col-start-3 col-span-2">
+            <a href="/sports" class="underline hover:underline-offset-4 underline-offset-2 text-lg font-semibold text-teal-600 mt-2">Home</a>
             <h1 class="text-4xl font-semibold text-slate-600 mt-3"><%= sportName %> Insights</h1>
             <h3 class="text-xl font-semibold text-stone-400 mt-3">Click on the Sessions to see details.</h3>
             <% if(!isNaN(startDate) && !isNaN(endDate)){ %>
@@ -47,11 +48,12 @@
             <% } %>
             
             <h2 class="text-fuchsia-500 font-semibold font-serif mt-2f">Previous Sessions - <%= previousSession.length %></h2>
-            <% if(previousSession.length > 0){ %>
+            <div class="w-fit">
+                <% if(previousSession.length > 0){ %>
         <ul class="list-none mt-6">
                 <% for(var i=0; i < previousSession.length; i++) { %>
                 <li>
-                    <div class="flex items-center w-fit my-2 px-2 py-1 rounded hover:bg-purple-50 border border-violet-400">
+                    <div class="flex items-center w-full place-content-evenly my-2 px-2 py-1 rounded hover:bg-purple-50 border border-violet-400">
                         <a class="text-base" href="/sports/<%= sportName %>/previous-session/<%= previousSession[i].id %>"><%= previousSession[i].dateTime.toLocaleDateString('en-US',{
                         year: 'numeric',
                         month: 'long',
@@ -74,14 +76,16 @@
             <% }else{ %>
                 <h2 class="font-semibold font-serif text-red-400 font-semibold font-serif">There are no previous sessions available.</h2>
                 <% } %>
+            </div>
                 <hr class="rounded mt-4 mb-4">
                 <!-- todays sessions -->
                  <h2 class="text-fuchsia-500 font-semibold font-serif mt-2f">Today's Sessions - <%= todaysSession.length %></h2>
-            <% if(todaysSession.length > 0){ %>
+            <div class="w-fit">
+                <% if(todaysSession.length > 0){ %>
         <ul class="list-none mt-6">
                 <% for(var i=0; i < todaysSession.length; i++) { %>
                 <li>
-                    <div class="flex items-center w-fit my-2 px-2 py-1 rounded hover:bg-purple-50 border border-violet-400">
+                    <div class="flex items-center w-full place-content-evenly my-2 px-2 py-1 rounded hover:bg-purple-50 border border-violet-400">
                         <% if(todaysSession[i].dateTime < new Date()){ %>
                             <a class="text-base" href="/sports/<%= sportName %>/previous-session/<%= todaysSession[i].id %>"><%= todaysSession[i].sportName %>-<%= todaysSession[i].dateTime.toLocaleDateString('en-US',{
                         year: 'numeric',
@@ -117,14 +121,16 @@
             <% }else{ %>
                 <h2 class="font-semibold font-serif text-red-400 font-semibold font-serif">There are no todays's sessions available.</h2>
                 <% } %>
+            </div>
                 <hr class="rounded mt-4 mb-4">
                 <!-- upcoming sessions -->
                  <h2 class="text-fuchsia-500 font-semibold font-serif mt-2f">Upcoming Sessions - <%= upcomingSession.length %></h2>
-            <% if(upcomingSession.length > 0){ %>
+            <div class="w-fit">
+                <% if(upcomingSession.length > 0){ %>
         <ul class="list-none mt-6">
                 <% for(var i=0; i < upcomingSession.length; i++) { %>
                 <li>
-                    <div class="flex items-center w-fit my-2 px-2 py-1 rounded hover:bg-purple-50 border border-violet-400">
+                    <div class="flex items-center w-full place-content-evenly my-2 px-2 py-1 rounded hover:bg-purple-50 border border-violet-400">
                         <a class="text-base" href="/sports/<%= sportName %>/session/<%= upcomingSession[i].id %>"><%= upcomingSession[i].dateTime.toLocaleDateString('en-US',{
                         year: 'numeric',
                         month: 'long',
@@ -147,14 +153,16 @@
             <% }else{ %>
                 <h2 class="font-semibold font-serif text-red-400 font-semibold font-serif">There are no upcoming sessions available.</h2>
                 <% } %>
+            </div>
                 <hr class="rounded mt-4 mb-4">
                 <!-- Canceled sessions -->
                  <h2 class="text-fuchsia-500 font-semibold font-serif mt-2f">Canceled Sessions - <%= canceledSession.length %></h2>
-            <% if(canceledSession.length > 0){ %>
+           <div class="w-fit">
+             <% if(canceledSession.length > 0){ %>
         <ul class="list-none mt-6">
                 <% for(var i=0; i < canceledSession.length; i++) { %>
                 <li>
-                    <div class="flex items-center w-fit my-2 px-2 py-1 rounded hover:bg-purple-50 border border-violet-400">
+                    <div class="flex items-center w-full place-content-evenly my-2 px-2 py-1 rounded hover:bg-purple-50 border border-violet-400">
                         <a class="text-base" href="/sports/<%= sportName %>/canceled-session/<%= canceledSession[i].id %>"><%= canceledSession[i].dateTime.toLocaleDateString('en-US',{
                         year: 'numeric',
                         month: 'long',
@@ -178,6 +186,7 @@
             <% }else{ %>
                 <h2 class="font-semibold font-serif text-red-400 font-semibold font-serif">There are no canceled sessions available.</h2>
                 <% } %>
+           </div>
         </div>
      </div>
 </body>

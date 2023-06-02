@@ -125,11 +125,11 @@ app.post("/users", async (request, response) => {
     request.flash("error", "Last Name should not be empty!");
     flag = false;
   }
-  if (request.body.email == 0) {
+  if (request.body.email.length == 0) {
     request.flash("error", "Email should not be empty!");
     flag = false;
   }
-  if (request.body.password == 0) {
+  if (request.body.password.length == 0) {
     request.flash("error", "Password should not be empty!");
     flag = false;
   }
@@ -140,7 +140,7 @@ app.post("/users", async (request, response) => {
         lastName: request.body.lastName,
         email: request.body.email,
         password: hasedPwd,
-        role: "user",
+        role: "admin",
       });
 
       request.login(users, (err) => {
@@ -445,8 +445,16 @@ app.get(
     }
     const allowToJoin = sessions;
     let isJoined = current.length == 1;
+    let isAdminJoined = false;
+    for (var j = 0; i < players.length; i++) {
+      if (players[i].userId == userId) {
+        isAdminJoined = true;
+        break;
+      }
+    }
     response.render("session-detail", {
       session,
+      isAdminJoined,
       allowToJoin,
       players,
       userId,
@@ -682,7 +690,10 @@ app.get(
     }
     if (flag) {
       const sports = await Sports.getAllSports();
-      const rankings = [];
+      let TotalSessionsCount = 0;
+      let rankings = [];
+      let sports_Name = [];
+      let sportPercentage = [];
       for (var i = 0; i < sports.length; i++) {
         const sportsName = sports[i].sports_name;
         const count = await Sessions.getSessionsCountBySName(
@@ -690,11 +701,17 @@ app.get(
           start,
           end
         );
+        TotalSessionsCount += count;
         rankings.push({ name: sportsName, count: count });
+        sports_Name.push(sportsName.toString());
+        sportPercentage.push(count);
       }
       rankings.sort((a, b) => b.count - a.count);
       response.render("reports", {
+        TotalSessionsCount,
         rankings,
+        sports_Name,
+        sportPercentage,
         csrfToken: request.csrfToken(),
       });
     } else {
@@ -806,6 +823,26 @@ app.post(
     } else {
       response.redirect("/User/changePassword");
     }
+  }
+);
+
+app.get(
+  "/user/user-sessions",
+  connectEnsureLogin.ensureLoggedIn(),
+  async (request, response) => {
+    const userId = request.user.id;
+    const players = await Players.getPlayersByUserId(userId);
+    let sessionIds = [];
+    for (var i = 0; i < players.length; i++) {
+      sessionIds.push(players[i].sessionId);
+    }
+    const previousSession = await Sessions.getPreviousSessionsByIds(sessionIds);
+    const canceledSession = await Sessions.getCanceledSessionsByIds(sessionIds);
+    response.render("user-sessions", {
+      previousSession,
+      canceledSession,
+      csrfToken: request.csrfToken(),
+    });
   }
 );
 

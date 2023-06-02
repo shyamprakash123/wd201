@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@48,400,1,0" />
+    <style>
+        hr.rounded {
+        border-top: 8px solid #d7d7d7;
+        border-radius: 5px;
+        }
+    </style>
+    <title>Session you Joined</title>
+</head>
+<body>
+     <div class="grid grid-cols-6">
+        <div class="col-start-3 col-span-2">
+            <a href="/sports" class="underline hover:underline-offset-4 underline-offset-2 text-lg font-semibold text-teal-600 mt-2">Home</a>
+            <h1 class="text-4xl font-semibold text-slate-600 mt-3">Session You Joined</h1>
+            <h3 class="text-xl font-semibold text-stone-400 mt-3">Click on the Sessions to see details.</h3>
+            <h2 class="text-fuchsia-500 font-semibold font-serif mt-2f">Previous Sessions - <%= previousSession.length %></h2>
+            <div class="w-fit">
+                <% if(previousSession.length > 0){ %>
+        <ul class="list-none mt-6">
+                <% for(var i=0; i < previousSession.length; i++) { %>
+                <li>
+                    <div class="flex items-center w-full place-content-evenly my-2 px-2 py-1 rounded hover:bg-purple-50 border border-violet-400">
+                        <a class="text-base" href="/sports/<%= previousSession[i].sportName %>/previous-session/<%= previousSession[i].id %>"><%= previousSession[i].dateTime.toLocaleDateString('en-US',{
+                        year: 'numeric',
+                        month: 'long',
+                        day: 'numeric',
+                        hour: 'numeric',
+                        minute: 'numeric',
+                        hour12: true
+                        }) %></a>
+                         <% if(previousSession[i].players==1){ %>
+                            <p class="text-base text-red-700 ml-5"> Last Slot</p>
+                        <% }else if(previousSession[i].players==0){ %>
+                            <p class="text-base text-red-700 ml-5"> Fully Booked</p>
+                            <% }else{ %>
+                                <p class="text-base ml-5"><%= previousSession[i].players+" slots" %></p>
+                            <% } %>
+                    </div>
+                </li>
+                <% } %>
+            </ul>
+            <% }else{ %>
+                <h2 class="font-semibold font-serif text-red-400 font-semibold font-serif">There are no previous sessions available.</h2>
+                <% } %>
+            </div>
+                <hr class="rounded mt-4 mb-4">
+                <!-- Canceled sessions -->
+                 <h2 class="text-fuchsia-500 font-semibold font-serif mt-2f">Canceled Sessions - <%= canceledSession.length %></h2>
+           <div class="w-fit">
+             <% if(canceledSession.length > 0){ %>
+        <ul class="list-none mt-6">
+                <% for(var i=0; i < canceledSession.length; i++) { %>
+                <li>
+                    <div class="flex items-center w-full place-content-evenly my-2 px-2 py-1 rounded hover:bg-purple-50 border border-violet-400">
+                        <a class="text-base" href="/sports/<%= canceledSession[i].sportName %>/canceled-session/<%= canceledSession[i].id %>"><%= canceledSession[i].dateTime.toLocaleDateString('en-US',{
+                        year: 'numeric',
+                        month: 'long',
+                        day: 'numeric',
+                        hour: 'numeric',
+                        minute: 'numeric',
+                        hour12: true
+                        }) %></a>
+                         <% if(canceledSession[i].players==1){ %>
+                            <p class="text-base text-red-700 ml-5"> Last Slot</p>
+                        <% }else if(canceledSession[i].players==0){ %>
+                            <p class="text-base text-red-700 ml-5"> Fully Booked</p>
+                            <% }else{ %>
+                                <p class="text-base ml-5"><%= canceledSession[i].players+" slots" %></p>
+                            <% } %>
+                            <p class="text-base text-red-700 ml-5">Canceled</p>
+                    </div>
+                </li>
+                <% } %>
+            </ul>
+            <% }else{ %>
+                <h2 class="font-semibold font-serif text-red-400 font-semibold font-serif">There are no canceled sessions available.</h2>
+                <% } %>
+           </div>
+        </div>
+     </div>
+</body>
+</html>

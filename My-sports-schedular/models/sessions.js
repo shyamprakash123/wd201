@@ -61,6 +61,27 @@ module.exports = (sequelize, DataTypes) => {
       });
     }
 
+    static getPreviousSessionsByIds(ids) {
+      return this.findAll({
+        where: {
+          id: ids,
+          isCanceled: false,
+          dateTime: {
+            [Op.lt]: today,
+          },
+        },
+      });
+    }
+
+    static getCanceledSessionsByIds(ids) {
+      return this.findAll({
+        where: {
+          id: ids,
+          isCanceled: true,
+        },
+      });
+    }
+
     static newSession(
       date,
       place,
@@ -178,6 +199,10 @@ module.exports = (sequelize, DataTypes) => {
           sportName,
         },
       });
+    }
+
+    static getTotalSessionsCount() {
+      return this.count();
     }
 
     static getSessionsCountBySName(sportName, start, end) {

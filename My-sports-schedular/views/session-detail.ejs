@@ -13,7 +13,7 @@
 }
 
 .users:hover .trash-icon {
-  display: block;
+  color: red;
 }
 
 .users {
@@ -120,6 +120,7 @@
 <body>
     <div class="grid grid-cols-6">
         <div class="col-start-3 col-span-2">
+            <a href="/sports" class="underline hover:underline-offset-4 underline-offset-2 text-lg font-semibold text-teal-600 mt-2">Home</a>
             <h1 class="text-4xl font-semibold text-slate-600 mt-3"><%= session[0].sportName %> Session #<%= session[0].id %></h1>
     <h3 class="text-2xl font-semibold text-stone-500 mt-3">This session is scheduled for <%= session[0].dateTime.toLocaleString('en-US', {
   day: '2-digit',
@@ -134,14 +135,16 @@
     <% } %>
     <h3 class="text-2xl font-semibold text-slate-400 mt-3">Players - <%= session[0].members.length+players.length %></h3>
 
-    <% if(session[0].members.length > 0){ %>
+        <div class="w-fit">
+                <% if(session[0].members.length > 0){ %>
         <ul class="list-none">
                 <% for(var i=0; i < session[0].members.length; i++) { %>
                 <li class="users">
-                    <div class="flex items-center w-fit my-2 px-2 py-1 rounded hover:bg-purple-50 border border-violet-400">
+                    <div class="flex w-full items-center  my-2 px-2 py-1 rounded hover:bg-purple-50 border border-violet-400">
                         <h3><%= session[0].members[i] %></h3>
+                        <p class="w-full"></p>
                         <% if(session[0].userId==userId){ %>
-                            <a href="#" class="hidden trash-icon ml-2" onclick="deleteMember(<%= i %>)">
+                                <a href="#" class="text-transparent trash-icon ml-2 float-right" onclick="deleteMember(<%= i %>)">
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0" />
                             </svg>
@@ -157,7 +160,7 @@
         <ul class="list-none">
                 <% for(var i=0; i < players.length; i++) { %>
                 <li class="users">
-                    <div class="flex items-center w-fit my-2 px-2 py-1 rounded hover:bg-purple-50 border border-violet-400">
+                    <div class="flex items-center w-full my-2 px-2 py-1 rounded hover:bg-purple-50 border border-violet-400">
                         <% if(players[i].userId==userId){ %>
                             <h3 class="text-slate-500">You</h3>
                         <% }else{ %>
@@ -168,8 +171,9 @@
                                 <h3><%= players[i].userName %></h3>
                             <% } %>
                             <% } %>
+                            <p class="w-full"></p>
                         <% if(session[0].userId==userId){ %>
-                            <a href="#" class="hidden trash-icon ml-2" onclick="deletePlayer(<%= players[i].userId %>)">
+                            <a href="#" class="text-transparent  trash-icon ml-2" onclick="deletePlayer(<%= players[i].userId %>)">
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0" />
                             </svg>
@@ -180,12 +184,16 @@
                 <% } %>
             </ul>
             <% } %>
+        </div>
 
             <% if(session[0].members.length==0 && players.length==0){ %>
                 <h2 class="font-semibold font-serif text-red-400 font-semibold font-serif mt-5">There are no players available in this session. Join?</h2>
             <% } %>
                 <% if(session[0].userId==userId){ %>
                     <div>
+                    <% if(session[0].players > 0 && allowToJoin==null && !isAdminJoined){ %>
+                        <button type="submit" onclick="addPlayer()" class="text-white bg-green-600 hover:bg-green-800 font-medium rounded px-5 py-2">Join this session</button><br>
+                        <% } %>
                     <a class="underline hover:underline-offset-4 underline-offset-2 text-green-500 font-serif" href="/sports/editsession/<%= session[0].sportName %>/<%= session[0].id %>"><span class="material-symbols-outlined">edit_square</span>Edit session</a>
                     <a class="underline hover:underline-offset-4 underline-offset-2 text-red-500 font-serif ml-5" href="/sports/cancel-session/<%= session[0].id %>"><span class="material-symbols-outlined">cancel</span>Cancel session</a>
                 </div>

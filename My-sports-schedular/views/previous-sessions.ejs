@@ -10,17 +10,19 @@
 <body>
     <div class="grid grid-cols-6">
         <div class="col-start-3 col-span-2">
+            <a href="/sports" class="underline hover:underline-offset-4 underline-offset-2 text-lg font-semibold text-teal-600 mt-2">Home</a>
             <div>
                 <h1 class="text-6xl font-semibold text-slate-600 mt-3"><%= sport[0].sports_name %></h1>
             </div>
         <div class="mt-3">
             <h3 class="text-4xl font-semibold text-stone-500 mt-3">Previous Sessions</h3>
         </div>
-    <% if(session.length > 0){ %>
+    <div class="w-fit">
+        <% if(session.length > 0){ %>
         <ul class="list-none mt-6">
                 <% for(var i=0; i < session.length; i++) { %>
                 <li>
-                    <div class="flex items-center w-fit my-2 px-2 py-1 rounded hover:bg-purple-50 border border-violet-400">
+                    <div class="flex items-center w-full place-content-evenly my-2 px-2 py-1 rounded hover:bg-purple-50 border border-violet-400">
                         <a class="text-base" href="/sports/<%= sport[0].sports_name %>/previous-session/<%= session[i].id %>"><%= session[i].dateTime.toLocaleDateString('en-US',{
                         year: 'numeric',
                         month: 'long',
@@ -44,6 +46,7 @@
             <% }else{ %>
                 <h2 class="font-semibold font-serif text-red-400 font-semibold font-serif mt-10">There are no previous sessions available.</h2>
                 <% } %>
+    </div>
     </div>
     </div>
 </body>
