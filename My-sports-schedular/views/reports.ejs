@@ -10,88 +10,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;700&display=swap" rel="stylesheet">
-    <style>
-        html,body{
-    height: 100%;
-    }
-hr.rounded {
-    border-top: 8px solid #d7d7d7;
-    border-radius: 5px;
-    }
-.main{
-    height: 100%;
-    width: 100%;
-    display: flex;
-    }
-.filter-content{
-    height: 100%;
-    width: 50%;
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    }
-.chart-content{
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    }
-
-.stats-heading{
-    font-family: "Rubik", sans-serif;
-    color: #023047;
-    text-transform: uppercase;
-    font-size: 24px;
-    text-align: center;
-}
-
-.right-content{
-    width: 50%;
-    height: 100%;
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-}
-
-.stats-content{
-    font-family: "Rubik", sans-serif;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 24px;
-    margin: 0 auto;
-    width: fit-content;
-    height: fit-content;
-    box-shadow: 0 4px 12px -2px rgba(0,0,0,0.3);
-    border-radius: 20px;
-    padding: 8px 32px;
-    color: #023047;
-    transition: all 400ms ease;
-}
-
-.stats-content:hover{
-    transform: scale(1.02);
-    box-shadow: 0 4px 16px -7px rgba(0,0,0,0.3);
-}
-
-.stats-content .details ul {
-    list-style: none;
-    padding: 0;
-
-}
-
-.stats-content .details ul li {
-    font-size: 16px;
-    margin: 12px 0px;
-    text-transform: uppercase;
-}
-
-.stats-content .details .percentage {
-    font-weight: 700;
-    color: #e63946;
-
-}
-    </style>
+    <link href="/css/reports.css" rel="stylesheet">
     
     <title>Reports</title>
 </head>
@@ -151,7 +70,7 @@ hr.rounded {
         </div>
     </div>
     <script>
-function filterDate(startDate,endDate){
+        function filterDate(startDate,endDate){
     window.location.href = `/sports/reports/insights/${startDate.toISOString()}/${endDate.toISOString()}`;
     }
 
@@ -203,7 +122,7 @@ new Chart(chart, {
 const populateUl = ()=> {
     chartData.labels.forEach((l, i) => {
         let li = document.createElement("li");
-        li.innerHTML = `${l}: <span class='percentage'>${(chartData.data[i]/TotalSessionsCount)*100}%</span>`;
+        li.innerHTML = `${l}: <span class='percentage'>${((chartData.data[i]/TotalSessionsCount)*100).toFixed(2)}%</span>`;
         ul.appendChild(li);
     })
 }

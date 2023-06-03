@@ -209,6 +209,7 @@ app.post(
   "/sports/new-sport",
   connectEnsureLogin.ensureLoggedIn(),
   async (request, response) => {
+    console.log("sucess-----------");
     const adminId = request.user.id;
     const sportName = request.body.sportName;
     let flag = true;
@@ -222,6 +223,7 @@ app.post(
         if (admin[0].role == "admin") {
           const sport = await Sports.addNewSport(sportName, adminId);
         }
+
         response.redirect(`/sports/${sportName}`);
       } catch (err) {
         request.flash("error", "Sport name already exists!");
@@ -292,13 +294,22 @@ app.get(
     const session = await Sessions.getSessionBySId(sportId);
     const admin = await User.getUser(adminId);
     const isAdmin = admin[0].role == "admin";
-    response.render("sessions", {
-      isAdmin,
-      sportName,
-      sportId,
-      session,
-      csrfToken: request.csrfToken(),
-    });
+    if (request.accepts("html")) {
+      response.render("sessions", {
+        isAdmin,
+        sportName,
+        sportId,
+        session,
+        csrfToken: request.csrfToken(),
+      });
+    } else {
+      response.json({
+        isAdmin,
+        sportName,
+        sportId,
+        session,
+      });
+    }
   }
 );
 
@@ -452,15 +463,26 @@ app.get(
         break;
       }
     }
-    response.render("session-detail", {
-      session,
-      isAdminJoined,
-      allowToJoin,
-      players,
-      userId,
-      isJoined,
-      csrfToken: request.csrfToken(),
-    });
+    if (request.accepts("html")) {
+      response.render("session-detail", {
+        session,
+        isAdminJoined,
+        allowToJoin,
+        players,
+        userId,
+        isJoined,
+        csrfToken: request.csrfToken(),
+      });
+    } else {
+      response.json({
+        session,
+        isAdminJoined,
+        allowToJoin,
+        players,
+        userId,
+        isJoined,
+      });
+    }
   }
 );
 
