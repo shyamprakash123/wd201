@@ -140,7 +140,7 @@ app.post("/users", async (request, response) => {
         lastName: request.body.lastName,
         email: request.body.email,
         password: hasedPwd,
-        role: "user",
+        role: "admin",
       });
 
       request.login(users, (err) => {
