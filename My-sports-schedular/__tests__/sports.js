@@ -153,7 +153,7 @@ describe("My-Sports-Schedular test suite", () => {
       });
     expect(response.statusCode).toBe(200);
 
-    // Gettin updated players count
+    // Getting updated players count
     const groupedTodosResponse2 = await agent
       .get(`/sports/${sportName}/session/${sessionId}`)
       .set("Accept", "application/json");
