@@ -173,9 +173,7 @@ module.exports = (sequelize, DataTypes) => {
         where: {
           id: ids,
           dateTime: {
-            [Op.not]: {
-              [Op.lt]: today,
-            },
+            [Op.gt]: today,
           },
         },
       });
