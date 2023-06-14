@@ -1,6 +1,7 @@
 "use strict";
 const { Model, Op } = require("sequelize");
 const today = new Date();
+today.setMinutes(today.getMinutes() + 330);
 const todayStart = new Date();
 todayStart.setHours(0, 0, 0, 0);
 const todayEnd = new Date();

@@ -22,8 +22,17 @@ module.exports = (sequelize, DataTypes) => {
         },
       });
     }
+
     static getAllSports() {
       return this.findAll();
+    }
+
+    static getSportsByAdminId(adminId) {
+      return this.findAll({
+        where: {
+          adminId: adminId,
+        },
+      });
     }
 
     static addNewSport(sportName, adminId) {

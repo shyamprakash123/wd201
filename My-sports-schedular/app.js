@@ -185,7 +185,16 @@ app.get(
     }
     const session = await Sessions.getSessionBySesId(listOfPlayers);
     const sessionByUser = await Sessions.getSessionByUId(loggedInUser);
+    let sportsByAdmin = [];
+    const admin = await User.getUser(loggedInUser);
+    if (admin[0].role == "admin") {
+      sportsByAdmin = await Sports.getSportsByAdminId(loggedInUser);
+    }
+    let date = new Date();
+    date.setMinutes(date.getMinutes() + 330);
     response.render("home", {
+      sportsByAdmin,
+      date,
       session,
       sessionByUser,
       user,
@@ -209,7 +218,6 @@ app.post(
   "/sports/new-sport",
   connectEnsureLogin.ensureLoggedIn(),
   async (request, response) => {
-    console.log("sucess-----------");
     const adminId = request.user.id;
     const sportName = request.body.sportName;
     let flag = true;

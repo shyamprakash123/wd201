@@ -27,7 +27,7 @@
     </div>
     <% if(user[0].role=="admin"){ %>
             <div>
-                <h3 class="text-xl mt-3 font-semibold text-orange-500">Administrative Actions</h3>
+            <h3 class="text-xl mt-3 font-semibold text-orange-500">Administrative Actions</h3>
             <a class="underline hover:underline-offset-4 underline-offset-2 text-sky-500 font-serif" href="/sports/new-sport">Create a new sport</a> <br>
             <a class="underline hover:underline-offset-4 underline-offset-2 text-sky-500 font-serif" href="/sports/reports/insights">View reports</a>
             </div>
@@ -79,6 +79,25 @@
                 <% } %> 
      </div>
                 <hr class="rounded mt-4">
+                <!-- sports by admin -->
+                <div style="margin: 50px;">
+                <h2 class="text-fuchsia-500 font-semibold font-serif mt-2f">The following sports that you have created!</h2>
+                <div class="w-fit">
+                    <% if(sportsByAdmin.length > 0) { %>
+                    <ul class="list-none">
+                <% for(var i=0; i < sportsByAdmin.length;i++){ %>
+                <li>
+                    <div class="flex w-full flex justify-center my-2 px-2 py-1 rounded hover:bg-purple-50 border border-indigo-300">
+                        <a class="text-base text-teal-500 font-semibold font-serif" href="/sports/<%=sportsByAdmin[i].sports_name%>"><%=sportsByAdmin[i].sports_name %></a>
+                    </div>
+                </li>
+                <% } %>
+            </ul>
+            <% } else { %>
+                <h2 class="font-semibold font-serif text-red-400 font-semibold font-serif">There are no sports created by you!</h2>
+                <% } %>
+                </div>
+            </div>
                 <!-- sports -->
             <div style="margin: 50px;">
                 <h2 class="text-fuchsia-500 font-semibold font-serif mt-2f">The following sports are available. Please select one:</h2>
@@ -135,7 +154,7 @@
                         hour12: true
                         }) %></a>
                         <% } %>
-                        <% if(sessionByUser[i].dateTime < new Date()){ %>
+                        <% if(sessionByUser[i].dateTime < date){ %>
                                 <p class="text-base text-red-700 ml-5">Expired</p>
                         <% }else if(sessionByUser[i].isCanceled==true){ %>
                                 <p class="text-base text-red-700 ml-5">CANCELED</p>
