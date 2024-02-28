@@ -54,3 +54,16 @@ jobs:
           npx sequelize-cli db:migrate
           PORT=3000 npm start &
           sleep 5
+
+  # Deployment steps in CI-CD Pipeline
+  deploy:
+    name: Deploy to render (production)
+    needs: run-tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Deploy to render (production)
+        uses: johnbeynon/render-deploy-action@v0.0.8
+        with:
+          service-id: ${{ secrets.SERVICE_ID }}
+          api-key: ${{ secrets.RENDER_API_KEY }}
