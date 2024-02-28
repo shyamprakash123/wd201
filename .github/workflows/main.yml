@@ -51,7 +51,7 @@ jobs:
           author_name: GitHub Actions
           steps: ${{toJson(steps)}}
           title: ${{ job.status }} ${{ github.repository }}
-          fields: Repo: ${{ github.repository }}
+          fields: Repo ${{ github.repository }}
           color: ${{ job.status == 'success' && 'good' || 'danger' }}
           channel: "My Sports Schedular Github Actions"
         if: always()
@@ -92,7 +92,7 @@ jobs:
           author_name: GitHub Actions
           steps: ${{toJson(steps)}}
           title: ${{ job.status }} ${{ github.repository }}
-          fields: Repo: ${{ github.repository }}
+          fields: Repo ${{ github.repository }}
           color: ${{ job.status == 'success' && 'good' || 'danger' }}
           channel: "My Sports Schedular Github Actions"
         if: always()
