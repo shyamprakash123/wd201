@@ -1,9 +1,10 @@
 name: Auto test L10 solution
 on: push
 env:
-  PG_DATABASE: sports-schedular
-  PG_USER: postgres
-  PG_PASSWORD: shyam@1234
+  PG_DATABASE: ${{ secrets.PG_DATABASE }}
+  PG_USER: ${{ secrets.PG_USER }}
+  PG_PASSWORD: ${{ secrets.PG_PASSWORD }}
+  SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
 jobs:
   # Label of the container job
   run-tests:
@@ -43,17 +44,33 @@ jobs:
       - name: Run unit tests
         run: cd My-sports-schedular && npm test
 
-      # Builds the app
-      - name: Run the app
-        id: run-app
+      - name: Notify Slack
+        uses: rtCamp/action-slack-notify@v2
+        with:
+          status: ${{ job.status }}
+          author_name: GitHub Actions
+          steps: ${{toJson(steps)}}
+          title: ${{ job.status }}: ${{ github.repository }}
+          fields: Repo: ${{ github.repository }}
+          color: ${{ job.status == 'success' && 'good' || 'danger' }}
+          channel: "My Sports Schedular Github Actions"
+        if: always()
+        env:
+          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
+
+      - name: Notify Success
+        if: success()
         run: |
-          cd My-sports-schedular
-          npm install
-          npx sequelize-cli db:drop
-          npx sequelize-cli db:create
-          npx sequelize-cli db:migrate
-          PORT=3000 npm start &
-          sleep 5
+          MESSAGE='🎉 Great news! Your tests was successful! 🚀'
+          PAYLOAD="{\"text\":\"$MESSAGE\"}"
+          curl -X POST -H 'Content-type: application/json' --data "$PAYLOAD" "${{ secrets.SLACK_WEBHOOK }}"
+
+      - name: Notify Failure
+        if: failure()
+        run: |
+          FAILURE_MESSAGE='⚠️ Oh no! The tests has failed! ❌'
+          FAILURE_PAYLOAD="{\"text\":\"$FAILURE_MESSAGE\"}"
+          curl -X POST -H 'Content-type: application/json' --data "$FAILURE_PAYLOAD" "${{ secrets.SLACK_WEBHOOK }}"
 
   # Deployment steps in CI-CD Pipeline
   deploy:
@@ -67,3 +84,31 @@ jobs:
         with:
           service-id: ${{ secrets.SERVICE_ID }}
           api-key: ${{ secrets.RENDER_API_KEY }}
+
+      - name: Notify Slack
+        uses: rtCamp/action-slack-notify@v2
+        with:
+          status: ${{ job.status }}
+          author_name: GitHub Actions
+          steps: ${{toJson(steps)}}
+          title: ${{ job.status }}: ${{ github.repository }}
+          fields: Repo: ${{ github.repository }}
+          color: ${{ job.status == 'success' && 'good' || 'danger' }}
+          channel: "My Sports Schedular Github Actions"
+        if: always()
+        env:
+          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
+
+      - name: Notify Success
+        if: success()
+        run: |
+          MESSAGE='🎉 Great news! Your deploy was successful! 🚀'
+          PAYLOAD="{\"text\":\"$MESSAGE\"}"
+          curl -X POST -H 'Content-type: application/json' --data "$PAYLOAD" "${{ secrets.SLACK_WEBHOOK }}"
+
+      - name: Notify Failure
+        if: failure()
+        run: |
+          FAILURE_MESSAGE='⚠️ Oh no! The deploy has failed! ❌'
+          FAILURE_PAYLOAD="{\"text\":\"$FAILURE_MESSAGE\"}"
+          curl -X POST -H 'Content-type: application/json' --data "$FAILURE_PAYLOAD" "${{ secrets.SLACK_WEBHOOK }}"
