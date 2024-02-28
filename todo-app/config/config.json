@@ -14,7 +14,10 @@
     "dialect": "postgres"
   },
   "production": {
-    "use_env_variable": "DATABASE_URL",
+    "username": "default",
+    "password": "wE1Yv0MgfoAm",
+    "database": "verceldb",
+    "host": "postgres://default:wE1Yv0MgfoAm@ep-black-art-a4mbcqq4-pooler.us-east-1.aws.neon.tech:5432/verceldb?sslmode=require",
     "dialect": "postgres"
   }
 }
