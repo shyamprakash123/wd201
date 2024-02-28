@@ -42,7 +42,7 @@ jobs:
 
       # Runs the unit tests
       - name: Run unit tests
-        run: cd My-sports-schedular && npm tes
+        run: cd My-sports-schedular && npm test
 
       - name: Notify Slack
         uses: rtCamp/action-slack-notify@v2
