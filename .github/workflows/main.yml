@@ -1,7 +1,7 @@
 name: Auto test L10 solution
 on: push
 env:
-  PG_DATABASE: wd-todo-test
+  PG_DATABASE: sports-schedular
   PG_USER: postgres
   PG_PASSWORD: shyam@1234
 jobs:
@@ -20,7 +20,7 @@ jobs:
         env:
           POSTGRES_USER: postgres
           POSTGRES_PASSWORD: shyam@1234
-          POSTGRES_DB: wd-todo-test
+          POSTGRES_DB: sports-schedular
         # Set health checks to wait until postgres has started
         options: >-
           --health-cmd pg_isready
@@ -36,25 +36,21 @@ jobs:
         uses: actions/checkout@v3
 
       # Performs a clean installation of all dependencies in the `package.json` file
-      # For more information, see https://docs.npmjs.com/cli/ci.html
       - name: Install dependencies
         run: cd todo-app && npm ci
 
+      # Runs the unit tests
       - name: Run unit tests
         run: cd todo-app && npm test
+
+      # Builds the app
       - name: Run the app
         id: run-app
         run: |
-          cd todo-app
+          cd My-sports-schedular
           npm install
           npx sequelize-cli db:drop
           npx sequelize-cli db:create
           npx sequelize-cli db:migrate
           PORT=3000 npm start &
           sleep 5
-
-      # - name: Run integration tests
-      #   run: |
-      #     cd l10
-      #     npm install cypress cypress-json-results
-      #     npx cypress run --env STUDENT_SUBMISSION_URL="http://localhost:3000/"

@@ -781,7 +781,10 @@ app.get(
     );
     let startDate = new Date(start);
     let endDate = new Date(end);
+    let date = new Date();
+    date.setMinutes(date.getMinutes() + 330);
     response.render("sport-insights", {
+      date,
       startDate,
       endDate,
       sportName,

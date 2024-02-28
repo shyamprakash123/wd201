@@ -86,7 +86,7 @@
                 <% for(var i=0; i < todaysSession.length; i++) { %>
                 <li>
                     <div class="flex items-center w-full place-content-evenly my-2 px-2 py-1 rounded hover:bg-purple-50 border border-violet-400">
-                        <% if(todaysSession[i].dateTime < new Date()){ %>
+                        <% if(todaysSession[i].dateTime < date){ %>
                             <a class="text-base" href="/sports/<%= sportName %>/previous-session/<%= todaysSession[i].id %>"><%= todaysSession[i].sportName %>-<%= todaysSession[i].dateTime.toLocaleDateString('en-US',{
                         year: 'numeric',
                         month: 'long',
@@ -105,7 +105,7 @@
                         hour12: true
                         }) %></a>
                         <% } %>
-                        <% if(todaysSession[i].dateTime < new Date()){ %>
+                        <% if(todaysSession[i].dateTime < date){ %>
                                 <p class="text-base text-red-700 ml-5">Expired</p>
                          <% }else if(todaysSession[i].players==1){ %>
                             <p class="text-base text-red-700 ml-5"> Last Slot</p>

@@ -1,1 +1,4 @@
 node_modules
+
+ // "pretest": "NODE_ENV=test npx sequelize-cli db:drop && NODE_ENV=test npx sequelize-cli db:create",
+    //"prepare": "cd ..&& husky install todo-app/.husky",
