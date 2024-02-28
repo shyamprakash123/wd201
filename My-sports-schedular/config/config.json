@@ -14,7 +14,10 @@
     "dialect": "postgres"
   },
   "production": {
-    "use_env_variable": "DATABASE_URL",
+    "username": "postgres",
+    "password": "shyam@1234",
+    "database": "sports-schedular",
+    "host": "127.0.0.1",
     "dialect": "postgres"
   }
 }
