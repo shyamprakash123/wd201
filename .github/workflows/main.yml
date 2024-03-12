@@ -87,7 +87,7 @@ jobs:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
 
-      - name: Build Docker Image
+      - name: Build Docker Image && Push to Docker Hub
         run: |
           cd todo-app
           docker build -t ${{ secrets.DOCKER_USERNAME }}/todo-app .
